@@ -9,6 +9,13 @@ class EGateRequest extends Model
 {
     use HasFactory;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'egate_requests';
+
     protected $fillable = [
         'method',
         'type',
