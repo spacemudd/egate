@@ -11,153 +11,286 @@ class EGateController extends Controller
 {
     /**
      * Handle eGate requests (both heartbeat and access control)
+     * BULLETPROOF AUDIT: Logs EVERYTHING that comes in, no matter what
      */
     public function handleRequest(Request $request): JsonResponse
     {
+        // STEP 1: IMMEDIATE AUDIT LOG - Capture EVERYTHING before ANY processing
+        $auditData = $this->captureCompleteAuditData($request);
+        
+        // STEP 2: Store the raw request data immediately (audit trail)
+        $egateRequest = $this->storeRawRequest($request, $auditData);
+        
         try {
-            // Get the method from query parameter
+            // STEP 3: Now try to process the request
             $method = $request->query('method');
             
             if (!$method) {
+                // Log the missing method error but STILL log everything
+                $this->logValidationError($egateRequest, 'Method parameter is required', $auditData);
                 return response()->json(['error' => 'Method parameter is required'], 400);
             }
 
-            // Store the request data
-            $egateRequest = $this->storeRequest($request, $method);
-            
-            // Handle different request types
+            // STEP 4: Handle different request types
             switch ($method) {
                 case 'GetStatus':
-                    return $this->handleHeartbeat($request, $egateRequest);
+                    return $this->handleHeartbeat($request, $egateRequest, $auditData);
                 case 'SearchCardAcs':
-                    return $this->handleAccessControl($request, $egateRequest);
+                    return $this->handleAccessControl($request, $egateRequest, $auditData);
                 default:
+                    // Log the unknown method error but STILL log everything
+                    $this->logValidationError($egateRequest, 'Unknown method: ' . $method, $auditData);
                     return response()->json(['error' => 'Unknown method'], 400);
             }
+            
         } catch (\Exception $e) {
-            Log::error('EGate request error: ' . $e->getMessage(), [
-                'request' => $request->all(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            // STEP 5: Log ANY exception that occurs
+            $this->logException($egateRequest, $e, $auditData);
             
             return response()->json(['error' => 'Internal server error'], 500);
         }
     }
 
     /**
-     * Handle heartbeat requests (GetStatus)
+     * Capture COMPLETE audit data from the request - EVERYTHING
      */
-    private function handleHeartbeat(Request $request, EGateRequest $egateRequest): JsonResponse
+    private function captureCompleteAuditData(Request $request): array
     {
-        // Extract key from request
-        $key = $request->input('Key') ?? $request->query('Key');
-        
-        if (!$key) {
-            $egateRequest->update([
-                'response_status' => 'error',
-                'response_data' => ['error' => 'Key parameter missing']
-            ]);
-            return response()->json(['error' => 'Key parameter is required'], 400);
-        }
+        return [
+            'timestamp' => now()->toISOString(),
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'path' => $request->path(),
+            'query_string' => $request->getQueryString(),
+            'query_params' => $request->query(),
+            'post_data' => $request->post(),
+            'raw_body' => $request->getContent(),
+            'headers' => $request->headers->all(),
+            'cookies' => $request->cookies->all(),
+            'server_vars' => $request->server(),
+            'request_size' => $request->header('Content-Length'),
+            'referer' => $request->header('Referer'),
+            'accept' => $request->header('Accept'),
+            'content_type' => $request->header('Content-Type'),
+            'connection' => $request->header('Connection'),
+            'host' => $request->header('Host'),
+            'x_forwarded_for' => $request->header('X-Forwarded-For'),
+            'x_real_ip' => $request->header('X-Real-IP'),
+            'cf_connecting_ip' => $request->header('CF-Connecting-IP'),
+            'cf_ray' => $request->header('CF-Ray'),
+            'cf_ipcountry' => $request->header('CF-IPCountry'),
+            'request_id' => uniqid('req_', true),
+            'microtime' => microtime(true),
+        ];
+    }
 
-        // Basic heartbeat response - just return the key
-        $response = ['Key' => $key];
-        
-        // Store response
+    /**
+     * Store the raw request data immediately for audit purposes - NO VALIDATION
+     */
+    private function storeRawRequest(Request $request, array $auditData): EGateRequest
+    {
+        // Extract what we can from the request, even if incomplete or malformed
+        $method = $request->query('method') ?? $request->input('method') ?? 'UNKNOWN';
+        $type = $request->query('type') ?? $request->input('type') ?? null;
+        $serial = $request->query('Serial') ?? $request->input('Serial') ?? null;
+        $deviceId = $request->query('ID') ?? $request->input('ID') ?? null;
+        $macAddress = $request->query('MAC') ?? $request->input('MAC') ?? null;
+        $ipAddress = $request->query('IP') ?? $request->input('IP') ?? $request->ip();
+        $reader = $request->query('Reader') ?? $request->input('Reader') ?? null;
+        $source = $request->query('Source') ?? $request->input('Source') ?? null;
+        $status = $request->query('Status') ?? $request->input('Status') ?? null;
+        $input = $request->query('Input') ?? $request->input('Input') ?? null;
+        $card = $request->query('Card') ?? $request->input('Card') ?? null;
+        $data = $request->query('data') ?? $request->input('data') ?? null;
+        $index = $request->query('Index') ?? $request->input('Index') ?? null;
+        $key = $request->query('Key') ?? $request->input('Key') ?? null;
+        $now = $request->query('Now') ?? $request->input('Now') ?? null;
+        $crc = $request->query('Crc') ?? $request->input('Crc') ?? null;
+        $t1 = $request->query('T1') ?? $request->input('T1') ?? null;
+        $h1 = $request->query('H1') ?? $request->input('H1') ?? null;
+        $t2 = $request->query('T2') ?? $request->input('T2') ?? null;
+        $h2 = $request->query('H2') ?? $request->input('H2') ?? null;
+        $nextNum = $request->query('NextNum') ?? $request->input('NextNum') ?? null;
+        $ver = $request->query('Ver') ?? $request->input('Ver') ?? null;
+        $willPass = $request->query('WillPass') ?? $request->input('WillPass') ?? null;
+        $passed = $request->query('Passed') ?? $request->input('Passed') ?? null;
+        $modbus = $request->query('Modbus') ?? $request->input('Modbus') ?? null;
+        $orderCode = $request->query('OrderCode') ?? $request->input('OrderCode') ?? null;
+
+        // Store EVERYTHING, even if it's garbage data
+        return EGateRequest::create([
+            'method' => $method,
+            'type' => $type,
+            'serial' => $serial,
+            'device_id' => $deviceId,
+            'mac_address' => $macAddress,
+            'ip_address' => $ipAddress,
+            'reader' => $reader,
+            'source' => $source,
+            'status' => $status,
+            'input' => $input,
+            'card' => $card,
+            'data' => $data,
+            'index' => $index,
+            'key' => $key,
+            'now' => $now,
+            'crc' => $crc,
+            't1' => $t1,
+            'h1' => $h1,
+            't2' => $t2,
+            'h2' => $h2,
+            'next_num' => $nextNum,
+            'ver' => $ver,
+            'will_pass' => $willPass,
+            'passed' => $passed,
+            'modbus' => $modbus,
+            'order_code' => $orderCode,
+            'request_data' => $auditData, // Store the complete audit data
+            'response_status' => 'processing', // Mark as processing
+        ]);
+    }
+
+    /**
+     * Log validation errors with full audit context
+     */
+    private function logValidationError(EGateRequest $egateRequest, string $error, array $auditData): void
+    {
         $egateRequest->update([
-            'response_status' => 'success',
-            'response_data' => $response
+            'response_status' => 'validation_error',
+            'response_data' => [
+                'error' => $error,
+                'error_type' => 'validation',
+                'audit_context' => $auditData,
+                'timestamp' => now()->toISOString()
+            ]
         ]);
 
-        return response()->json($response);
+        Log::warning('eGate validation error: ' . $error, [
+            'request_id' => $egateRequest->id,
+            'audit_data' => $auditData,
+            'error_type' => 'validation'
+        ]);
+    }
+
+    /**
+     * Log exceptions with full audit context
+     */
+    private function logException(EGateRequest $egateRequest, \Exception $e, array $auditData): void
+    {
+        $errorData = [
+            'exception' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+            'audit_context' => $auditData,
+            'timestamp' => now()->toISOString()
+        ];
+
+        $egateRequest->update([
+            'response_status' => 'exception',
+            'response_data' => $errorData
+        ]);
+
+        Log::error('eGate request exception: ' . $e->getMessage(), [
+            'request_id' => $egateRequest->id,
+            'audit_data' => $auditData,
+            'exception' => $errorData
+        ]);
+    }
+
+    /**
+     * Handle heartbeat requests (GetStatus)
+     */
+    private function handleHeartbeat(Request $request, EGateRequest $egateRequest, array $auditData): JsonResponse
+    {
+        try {
+            // Extract key from request
+            $key = $request->input('Key') ?? $request->query('Key');
+            
+            if (!$key) {
+                // Log the missing key error but STILL log everything
+                $this->logValidationError($egateRequest, 'Key parameter missing in heartbeat', $auditData);
+                return response()->json(['error' => 'Key parameter is required'], 400);
+            }
+
+            // Basic heartbeat response - just return the key
+            $response = ['Key' => $key];
+            
+            // Store successful response
+            $egateRequest->update([
+                'response_status' => 'success',
+                'response_data' => [
+                    'response' => $response,
+                    'audit_context' => $auditData,
+                    'timestamp' => now()->toISOString()
+                ]
+            ]);
+
+            return response()->json($response);
+            
+        } catch (\Exception $e) {
+            $this->logException($egateRequest, $e, $auditData);
+            return response()->json(['error' => 'Heartbeat processing error'], 500);
+        }
     }
 
     /**
      * Handle access control requests (SearchCardAcs)
      */
-    private function handleAccessControl(Request $request, EGateRequest $egateRequest): JsonResponse
+    private function handleAccessControl(Request $request, EGateRequest $egateRequest, array $auditData): JsonResponse
     {
-        // Extract key from request
-        $key = $request->input('Key') ?? $request->query('Key');
-        
-        if (!$key) {
+        try {
+            // Extract key from request
+            $key = $request->input('Key') ?? $request->query('Key');
+            
+            if (!$key) {
+                // Log the missing key error but STILL log everything
+                $this->logValidationError($egateRequest, 'Key parameter missing in access control', $auditData);
+                return response()->json(['error' => 'Key parameter is required'], 400);
+            }
+
+            // Get request parameters
+            $type = $request->input('type') ?? $request->query('type');
+            $reader = $request->input('Reader') ?? $request->query('Reader');
+            $card = $request->input('Card') ?? $request->query('Card');
+            
+            // Determine access control response based on business logic
+            $accessGranted = $this->evaluateAccess($type, $card, $reader);
+            
+            // Build response
+            $response = [
+                'Key' => $key,
+                'AcsRes' => $accessGranted ? '1' : '0', // 1 = open, 0 = reject
+                'ActIndex' => $reader ?? '0', // 0 = entry, 1 = exit
+                'Time' => $accessGranted ? '3' : '0', // Relay action time in seconds
+            ];
+
+            // Add optional display fields if access is granted
+            if ($accessGranted) {
+                $response['Name'] = 'Authorized User';
+                $response['Note'] = 'Access granted';
+                $response['Voice'] = 'Welcome!';
+                $response['Systime'] = now()->format('Y-m-d H:i:s');
+            }
+
+            // Store successful response
             $egateRequest->update([
-                'response_status' => 'error',
-                'response_data' => ['error' => 'Key parameter missing']
+                'response_status' => $accessGranted ? '1' : '0',
+                'response_data' => [
+                    'response' => $response,
+                    'audit_context' => $auditData,
+                    'timestamp' => now()->toISOString()
+                ]
             ]);
-            return response()->json(['error' => 'Key parameter is required'], 400);
+
+            return response()->json($response);
+            
+        } catch (\Exception $e) {
+            $this->logException($egateRequest, $e, $auditData);
+            return response()->json(['error' => 'Access control processing error'], 500);
         }
-
-        // Get request parameters
-        $type = $request->input('type') ?? $request->query('type');
-        $reader = $request->input('Reader') ?? $request->query('Reader');
-        $card = $request->input('Card') ?? $request->query('Card');
-        
-        // Determine access control response based on business logic
-        // For now, we'll implement a simple logic - you can customize this
-        $accessGranted = $this->evaluateAccess($type, $card, $reader);
-        
-        // Build response
-        $response = [
-            'Key' => $key,
-            'AcsRes' => $accessGranted ? '1' : '0', // 1 = open, 0 = reject
-            'ActIndex' => $reader ?? '0', // 0 = entry, 1 = exit
-            'Time' => $accessGranted ? '3' : '0', // Relay action time in seconds
-        ];
-
-        // Add optional display fields if access is granted
-        if ($accessGranted) {
-            $response['Name'] = 'Authorized User';
-            $response['Note'] = 'Access granted';
-            $response['Voice'] = 'Welcome!';
-            $response['Systime'] = now()->format('Y-m-d H:i:s');
-        }
-
-        // Store response
-        $egateRequest->update([
-            'response_status' => $accessGranted ? '1' : '0',
-            'response_data' => $response
-        ]);
-
-        return response()->json($response);
-    }
-
-    /**
-     * Store the incoming request in database
-     */
-    private function storeRequest(Request $request, string $method): EGateRequest
-    {
-        $data = [
-            'method' => $method,
-            'type' => $request->input('type') ?? $request->query('type'),
-            'serial' => $request->input('Serial') ?? $request->query('Serial'),
-            'device_id' => $request->input('ID') ?? $request->query('ID'),
-            'mac_address' => $request->input('MAC') ?? $request->query('MAC'),
-            'ip_address' => $request->input('IP') ?? $request->query('IP'),
-            'reader' => $request->input('Reader') ?? $request->query('Reader'),
-            'source' => $request->input('Source') ?? $request->query('Source'),
-            'status' => $request->input('Status') ?? $request->query('Status'),
-            'input' => $request->input('Input') ?? $request->query('Input'),
-            'card' => $request->input('Card') ?? $request->query('Card'),
-            'data' => $request->input('data') ?? $request->query('data'),
-            'index' => $request->input('Index') ?? $request->query('Index'),
-            'key' => $request->input('Key') ?? $request->query('Key'),
-            'now' => $request->input('Now') ?? $request->query('Now'),
-            'crc' => $request->input('Crc') ?? $request->query('Crc'),
-            't1' => $request->input('T1') ?? $request->query('T1'),
-            'h1' => $request->input('H1') ?? $request->query('H1'),
-            't2' => $request->input('T2') ?? $request->query('T2'),
-            'h2' => $request->input('H2') ?? $request->query('H2'),
-            'next_num' => $request->input('NextNum') ?? $request->query('NextNum'),
-            'ver' => $request->input('Ver') ?? $request->query('Ver'),
-            'will_pass' => $request->input('WillPass') ?? $request->query('WillPass'),
-            'passed' => $request->input('Passed') ?? $request->query('Passed'),
-            'modbus' => $request->input('Modbus') ?? $request->query('Modbus'),
-            'order_code' => $request->input('OrderCode') ?? $request->query('OrderCode'),
-            'request_data' => $request->all(),
-        ];
-
-        return EGateRequest::create($data);
     }
 
     /**
@@ -191,41 +324,5 @@ class EGateController extends Controller
 
         // Default: deny access
         return false;
-    }
-
-    /**
-     * Show logs page
-     */
-    public function showLogs(Request $request)
-    {
-        $query = EGateRequest::query();
-        
-        // Filter by method
-        if ($request->filled('method')) {
-            $query->where('method', $request->method);
-        }
-        
-        // Filter by type
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
-        
-        // Filter by serial
-        if ($request->filled('serial')) {
-            $query->where('serial', 'like', '%' . $request->serial . '%');
-        }
-        
-        // Filter by date range
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-        
-        if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
-
-        $requests = $query->orderBy('created_at', 'desc')->paginate(50);
-        
-        return view('egate.logs', compact('requests'));
     }
 }
