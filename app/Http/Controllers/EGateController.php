@@ -10,43 +10,47 @@ use Illuminate\Support\Facades\Log;
 class EGateController extends Controller
 {
     /**
-     * Handle eGate requests (both heartbeat and access control)
-     * BULLETPROOF AUDIT: Logs EVERYTHING that comes in, no matter what
+     * Handle eGate requests with AES128 decryption support
      */
     public function handleRequest(Request $request): JsonResponse
     {
         // STEP 1: IMMEDIATE AUDIT LOG - Capture EVERYTHING before ANY processing
         $auditData = $this->captureCompleteAuditData($request);
         
-        // STEP 2: Store the raw request data immediately (audit trail)
+        // STEP 2: Check for encrypted data
+        $decryptedData = $this->handleEncryptedRequest($request);
+        if ($decryptedData) {
+            // Replace request data with decrypted data
+            $request = $this->createRequestFromDecryptedData($decryptedData, $request);
+            $auditData['encrypted'] = true;
+            $auditData['decrypted_successfully'] = true;
+        }
+        
+        // STEP 3: Store the raw request data immediately (audit trail)
         $egateRequest = $this->storeRawRequest($request, $auditData);
         
         try {
-            // STEP 3: Now try to process the request
-            $method = $request->query('method');
+            // Continue with existing logic...
+            $method = $request->query('method') ?? $request->input('method');
             
             if (!$method) {
-                // Log the missing method error but STILL log everything
                 $this->logValidationError($egateRequest, 'Method parameter is required', $auditData);
                 return response()->json(['error' => 'Method parameter is required'], 400);
             }
 
-            // STEP 4: Handle different request types
+            // Handle different request types
             switch ($method) {
                 case 'GetStatus':
                     return $this->handleHeartbeat($request, $egateRequest, $auditData);
                 case 'SearchCardAcs':
                     return $this->handleAccessControl($request, $egateRequest, $auditData);
                 default:
-                    // Log the unknown method error but STILL log everything
                     $this->logValidationError($egateRequest, 'Unknown method: ' . $method, $auditData);
                     return response()->json(['error' => 'Unknown method'], 400);
             }
             
         } catch (\Exception $e) {
-            // STEP 5: Log ANY exception that occurs
             $this->logException($egateRequest, $e, $auditData);
-            
             return response()->json(['error' => 'Internal server error'], 500);
         }
     }
@@ -201,34 +205,172 @@ class EGateController extends Controller
     }
 
     /**
+     * Handle encrypted requests using AES128
+     */
+    private function handleEncryptedRequest(Request $request): ?array
+    {
+        // Check for encrypted data parameter
+        $encryptedData = $request->input('DATAS') ?? $request->query('DATAS');
+        
+        if (!$encryptedData) {
+            return null; // Not an encrypted request
+        }
+
+        try {
+            // Get the AES128 key from configuration
+            $aesKey = config('egate.aes128_key');
+            
+            if (empty($aesKey)) {
+                Log::error('EGate AES128 key not configured');
+                throw new \Exception('AES128 encryption key not configured');
+            }
+
+            // Decrypt the data
+            $decryptedJson = $this->decryptAES128($encryptedData, $aesKey);
+            
+            // Parse JSON
+            $decryptedData = json_decode($decryptedJson, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('Invalid JSON after decryption: ' . json_last_error_msg());
+            }
+
+            Log::info('Successfully decrypted AES128 payload', [
+                'encrypted_length' => strlen($encryptedData),
+                'decrypted_length' => strlen($decryptedJson),
+                'has_method' => isset($decryptedData['method']) ? 'yes' : 'no'
+            ]);
+
+            return $decryptedData;
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to decrypt AES128 payload', [
+                'error' => $e->getMessage(),
+                'encrypted_data_length' => strlen($encryptedData),
+                'key_configured' => !empty(config('egate.aes128_key'))
+            ]);
+            
+            return null;
+        }
+    }
+
+    /**
+     * Decrypt AES128 encrypted data
+     */
+    private function decryptAES128(string $encryptedData, string $key): string
+    {
+        // Remove any whitespace and decode from hex or base64
+        $encryptedData = trim($encryptedData);
+        
+        // Try to decode from hex first (common format from controller)
+        if (ctype_xdigit($encryptedData)) {
+            $binaryData = hex2bin($encryptedData);
+        } else {
+            // Try base64 decode
+            $binaryData = base64_decode($encryptedData, true);
+            if ($binaryData === false) {
+                throw new \Exception('Invalid encrypted data format (not hex or base64)');
+            }
+        }
+        
+        // Prepare the key (pad or truncate to 16 bytes for AES128)
+        $key = substr(str_pad($key, 16, "\0"), 0, 16);
+        
+        // For AES128, we need to handle the encryption mode
+        // The controller likely uses ECB mode (common in embedded systems)
+        $decrypted = openssl_decrypt($binaryData, 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
+        
+        if ($decrypted === false) {
+            throw new \Exception('AES128 decryption failed: ' . openssl_error_string());
+        }
+        
+        // Remove padding
+        $decrypted = rtrim($decrypted, "\0");
+        
+        return $decrypted;
+    }
+
+    /**
+     * Create a new request object from decrypted data
+     */
+    private function createRequestFromDecryptedData(array $decryptedData, Request $originalRequest): Request
+    {
+        // Merge decrypted data with original request
+        $newData = array_merge($originalRequest->all(), $decryptedData);
+        
+        // Create new request with decrypted data
+        $newRequest = new Request($newData);
+        $newRequest->headers = $originalRequest->headers;
+        $newRequest->server = $originalRequest->server;
+        
+        return $newRequest;
+    }
+
+    /**
+     * Encrypt response data using AES128 (for encrypted responses)
+     */
+    private function encryptResponse(array $responseData): string
+    {
+        $aesKey = config('egate.aes128_key');
+        
+        if (empty($aesKey)) {
+            throw new \Exception('AES128 encryption key not configured');
+        }
+        
+        $jsonData = json_encode($responseData);
+        $key = substr(str_pad($aesKey, 16, "\0"), 0, 16);
+        
+        // Encrypt using AES-128-ECB (to match controller expectations)
+        $encrypted = openssl_encrypt($jsonData, 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
+        
+        if ($encrypted === false) {
+            throw new \Exception('AES128 encryption failed: ' . openssl_error_string());
+        }
+        
+        // Return as hex string (common format for controller)
+        return strtoupper(bin2hex($encrypted));
+    }
+
+    /**
      * Handle heartbeat requests (GetStatus)
      */
     private function handleHeartbeat(Request $request, EGateRequest $egateRequest, array $auditData): JsonResponse
     {
         try {
+            // Check if request was encrypted
+            $isEncrypted = isset($auditData['encrypted']) && $auditData['encrypted'];
+            
             // Extract key from request
             $key = $request->input('Key') ?? $request->query('Key');
             
             if (!$key) {
-                // Log the missing key error but STILL log everything
                 $this->logValidationError($egateRequest, 'Key parameter missing in heartbeat', $auditData);
                 return response()->json(['error' => 'Key parameter is required'], 400);
             }
 
-            // Basic heartbeat response - just return the key
+            // Basic heartbeat response
             $response = ['Key' => $key];
+            
+            // If request was encrypted, encrypt the response
+            if ($isEncrypted) {
+                $encryptedResponse = $this->encryptResponse($response);
+                $responseBody = ['DATAS' => $encryptedResponse];
+            } else {
+                $responseBody = $response;
+            }
             
             // Store successful response
             $egateRequest->update([
                 'response_status' => 'success',
                 'response_data' => [
-                    'response' => $response,
+                    'response' => $responseBody,
+                    'encrypted' => $isEncrypted,
                     'audit_context' => $auditData,
                     'timestamp' => now()->toISOString()
                 ]
             ]);
 
-            return response()->json($response);
+            return response()->json($responseBody);
             
         } catch (\Exception $e) {
             $this->logException($egateRequest, $e, $auditData);
@@ -242,9 +384,9 @@ class EGateController extends Controller
     private function handleAccessControl(Request $request, EGateRequest $egateRequest, array $auditData): JsonResponse
     {
         try {
-            // Extract key from request (optional for access control)
-            $key = $request->input('Key') ?? $request->query('Key');
-
+            // Check if request was encrypted
+            $isEncrypted = isset($auditData['encrypted']) && $auditData['encrypted'];
+            
             // Get request parameters
             $type = $request->input('type') ?? $request->query('type');
             $reader = $request->input('Reader') ?? $request->query('Reader');
@@ -255,21 +397,16 @@ class EGateController extends Controller
             
             // Build response
             $response = [
-                'AcsRes' => $accessResult['granted'] ? '1' : '0', // 1 = open, 0 = reject
-                'ActIndex' => $reader ?? '0', // 0 = entry, 1 = exit
-                'Time' => $accessResult['granted'] ? '3' : '0', // Relay action time in seconds
+                'AcsRes' => $accessResult['granted'] ? '1' : '0',
+                'ActIndex' => $reader ?? '0',
+                'Time' => $accessResult['granted'] ? '3' : '0',
             ];
-
-            // Add Key if it was provided
-            if ($key) {
-                $response['Key'] = $key;
-            }
 
             // Add optional display fields
             if ($accessResult['granted']) {
                 $response['Name'] = $accessResult['name'] ?? 'Authorized User';
                 $response['Note'] = 'Welcome';
-                $response['Voice'] = $accessResult['voice'] ?? 'Welcome!';
+                $response['Voice'] = $accessResult['voice'] ?? 'Bobo';
                 $response['Systime'] = now()->format('Y-m-d H:i:s');
             } else {
                 $response['Name'] = 'Access Denied';
@@ -277,18 +414,27 @@ class EGateController extends Controller
                 $response['Voice'] = 'Access denied';
             }
 
+            // If request was encrypted, encrypt the response
+            if ($isEncrypted) {
+                $encryptedResponse = $this->encryptResponse($response);
+                $responseBody = ['DATAS' => $encryptedResponse];
+            } else {
+                $responseBody = $response;
+            }
+
             // Store successful response
             $egateRequest->update([
                 'response_status' => $accessResult['granted'] ? '1' : '0',
                 'response_data' => [
-                    'response' => $response,
+                    'response' => $responseBody,
+                    'encrypted' => $isEncrypted,
                     'audit_context' => $auditData,
                     'access_result' => $accessResult,
                     'timestamp' => now()->toISOString()
                 ]
             ]);
 
-            return response()->json($response);
+            return response()->json($responseBody);
             
         } catch (\Exception $e) {
             $this->logException($egateRequest, $e, $auditData);
