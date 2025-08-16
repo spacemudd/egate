@@ -11,7 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Disable CSRF protection for door control routes and eGate API endpoints
+        $middleware->validateCsrfTokens(except: [
+            'door/*',
+            'data/*'
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -492,23 +492,18 @@
             submitButton.textContent = 'Executing...';
             
             try {
-                // Get CSRF token from meta tag
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                
-                // Prepare form data
-                const requestData = new FormData();
-                requestData.append('_token', csrfToken);
-                requestData.append('door', formData.get('door'));
-                requestData.append('action', formData.get('action'));
-                requestData.append('duration', formData.get('duration'));
-                
                 const response = await fetch('{{ route("door.open") }}', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
+                        'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
                     },
-                    body: requestData
+                    body: JSON.stringify({
+                        door: formData.get('door'),
+                        action: formData.get('action'),
+                        duration: parseInt(formData.get('duration'))
+                    })
                 });
                 
                 if (!response.ok) {
