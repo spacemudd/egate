@@ -242,14 +242,8 @@ class EGateController extends Controller
     private function handleAccessControl(Request $request, EGateRequest $egateRequest, array $auditData): JsonResponse
     {
         try {
-            // Extract key from request
+            // Extract key from request (optional for access control)
             $key = $request->input('Key') ?? $request->query('Key');
-            
-            if (!$key) {
-                // Log the missing key error but STILL log everything
-                $this->logValidationError($egateRequest, 'Key parameter missing in access control', $auditData);
-                return response()->json(['error' => 'Key parameter is required'], 400);
-            }
 
             // Get request parameters
             $type = $request->input('type') ?? $request->query('type');
@@ -257,30 +251,39 @@ class EGateController extends Controller
             $card = $request->input('Card') ?? $request->query('Card');
             
             // Determine access control response based on business logic
-            $accessGranted = $this->evaluateAccess($type, $card, $reader);
+            $accessResult = $this->evaluateAccess($type, $card, $reader);
             
             // Build response
             $response = [
-                'Key' => $key,
-                'AcsRes' => $accessGranted ? '1' : '0', // 1 = open, 0 = reject
+                'AcsRes' => $accessResult['granted'] ? '1' : '0', // 1 = open, 0 = reject
                 'ActIndex' => $reader ?? '0', // 0 = entry, 1 = exit
-                'Time' => $accessGranted ? '3' : '0', // Relay action time in seconds
+                'Time' => $accessResult['granted'] ? '3' : '0', // Relay action time in seconds
             ];
 
-            // Add optional display fields if access is granted
-            if ($accessGranted) {
-                $response['Name'] = 'Authorized User';
-                $response['Note'] = 'Access granted';
-                $response['Voice'] = 'Welcome!';
+            // Add Key if it was provided
+            if ($key) {
+                $response['Key'] = $key;
+            }
+
+            // Add optional display fields
+            if ($accessResult['granted']) {
+                $response['Name'] = $accessResult['name'] ?? 'Authorized User';
+                $response['Note'] = 'Welcome';
+                $response['Voice'] = $accessResult['voice'] ?? 'Welcome!';
                 $response['Systime'] = now()->format('Y-m-d H:i:s');
+            } else {
+                $response['Name'] = 'Access Denied';
+                $response['Note'] = 'Not Authorized';
+                $response['Voice'] = 'Access denied';
             }
 
             // Store successful response
             $egateRequest->update([
-                'response_status' => $accessGranted ? '1' : '0',
+                'response_status' => $accessResult['granted'] ? '1' : '0',
                 'response_data' => [
                     'response' => $response,
                     'audit_context' => $auditData,
+                    'access_result' => $accessResult,
                     'timestamp' => now()->toISOString()
                 ]
             ]);
@@ -297,32 +300,111 @@ class EGateController extends Controller
      * Evaluate access based on business logic
      * This is where you implement your access control rules
      */
-    private function evaluateAccess(?string $type, ?string $card, ?string $reader): bool
+    private function evaluateAccess(?string $type, ?string $card, ?string $reader): array
     {
-        // For demonstration purposes, we'll implement some basic logic
-        // You should replace this with your actual business logic
+        // Initialize default result
+        $result = [
+            'granted' => false,
+            'name' => null,
+            'voice' => null,
+            'reason' => 'Unknown'
+        ];
         
         // If no card data, deny access
         if (empty($card)) {
-            return false;
+            $result['reason'] = 'No card data provided';
+            return $result;
+        }
+
+        // Handle QR codes (type 1 or 9)
+        if (in_array($type, ['1', '9'])) {
+            return $this->evaluateQRCode($card);
         }
 
         // Example: Allow access for card numbers starting with '123'
         if (str_starts_with($card, '123')) {
-            return true;
-        }
-
-        // Example: Allow access for QR codes (type 1 or 9)
-        if (in_array($type, ['1', '9']) && !empty($card)) {
-            return true;
+            $result['granted'] = true;
+            $result['name'] = 'Card User';
+            $result['voice'] = 'Welcome to the building';
+            $result['reason'] = 'Valid card number';
+            return $result;
         }
 
         // Example: Allow access for button requests (type 3)
         if ($type === '3') {
-            return true;
+            $result['granted'] = true;
+            $result['name'] = 'Button User';
+            $result['voice'] = 'Door opened by button';
+            $result['reason'] = 'Button request';
+            return $result;
         }
 
         // Default: deny access
-        return false;
+        $result['reason'] = 'No matching access rule';
+        return $result;
+    }
+
+    /**
+     * Evaluate QR code access patterns
+     */
+    private function evaluateQRCode(string $card): array
+    {
+        // Initialize default result
+        $result = [
+            'granted' => false,
+            'name' => null,
+            'voice' => null,
+            'reason' => 'Invalid QR code'
+        ];
+
+        try {
+            // Decode base64 QR code data
+            $decodedCard = base64_decode($card, true);
+            
+            // If base64 decode fails, try using the card data directly
+            if ($decodedCard === false) {
+                $decodedCard = $card;
+            }
+
+            Log::info('QR Code decoded', ['original' => $card, 'decoded' => $decodedCard]);
+
+            // Check for programmers-allow-{name} pattern
+            if (preg_match('/^programmers-allow-(.+)$/i', $decodedCard, $matches)) {
+                $name = trim($matches[1]);
+                
+                if (!empty($name)) {
+                    $result['granted'] = true;
+                    $result['name'] = ucfirst($name);
+                    $result['voice'] = "Welcome {$name} to the building";
+                    $result['reason'] = "Programmer access granted for {$name}";
+                    
+                    Log::info('Access granted for programmer', ['name' => $name, 'pattern' => 'allow']);
+                    return $result;
+                }
+            }
+
+            // Check for programmers-deny-{name} pattern
+            if (preg_match('/^programmers-deny-(.+)$/i', $decodedCard, $matches)) {
+                $name = trim($matches[1]);
+                
+                $result['granted'] = false;
+                $result['name'] = ucfirst($name);
+                $result['voice'] = "Access denied for {$name}";
+                $result['reason'] = "Programmer access denied for {$name}";
+                
+                Log::info('Access denied for programmer', ['name' => $name, 'pattern' => 'deny']);
+                return $result;
+            }
+
+            // For other QR codes, log and deny
+            Log::info('QR code does not match programmer patterns', ['decoded' => $decodedCard]);
+            $result['reason'] = 'QR code does not match required patterns';
+            
+        } catch (\Exception $e) {
+            Log::error('Error processing QR code', ['card' => $card, 'error' => $e->getMessage()]);
+            $result['reason'] = 'Error processing QR code';
+        }
+
+        return $result;
     }
 }
