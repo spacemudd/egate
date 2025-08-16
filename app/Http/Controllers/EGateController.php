@@ -375,8 +375,16 @@ class EGateController extends Controller
                 if (!empty($name)) {
                     $result['granted'] = true;
                     $result['name'] = ucfirst($name);
-                    $result['voice'] = "Welcome {$name} to the building";
+                    // Voice message is just "Bobo" - no name included
+                    $result['voice'] = "Bobo";
                     $result['reason'] = "Programmer access granted for {$name}";
+                    
+                    // Add debugging for voice message
+                    Log::info('Voice message being sent', [
+                        'voice' => $result['voice'], 
+                        'length' => strlen($result['voice']),
+                        'name' => $name
+                    ]);
                     
                     Log::info('Access granted for programmer', ['name' => $name, 'pattern' => 'allow']);
                     return $result;
