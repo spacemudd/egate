@@ -6,6 +6,7 @@ use App\Models\EGateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class EGateController extends Controller
 {
@@ -351,6 +352,29 @@ class EGateController extends Controller
             // Basic heartbeat response
             $response = ['Key' => $key];
             
+            // Check for pending door control commands
+            $pendingCommand = Cache::get('remote_door_command');
+            if ($pendingCommand) {
+                $response['AcsRes'] = $pendingCommand['acsRes'];
+                $response['ActIndex'] = $pendingCommand['actIndex'];
+                $response['Time'] = (string) $pendingCommand['duration'];
+                $response['Voice'] = $pendingCommand['voice'];
+                $response['Note'] = 'Remote control activated';
+                
+                // Clear the command after using it
+                Cache::forget('remote_door_command');
+                
+                // Store command execution in database for history
+                $this->storeDoorControlExecution($pendingCommand, $egateRequest);
+                
+                Log::info('Door control command executed via heartbeat', [
+                    'command' => $pendingCommand,
+                    'response' => $response,
+                    'device_serial' => $egateRequest->serial,
+                    'device_ip' => $egateRequest->ip_address
+                ]);
+            }
+            
             // If request was encrypted, encrypt the response
             if ($isEncrypted) {
                 $encryptedResponse = $this->encryptResponse($response);
@@ -560,5 +584,205 @@ class EGateController extends Controller
         }
 
         return $result;
+    }
+
+    /**
+     * Remote door control - queues a command for the next heartbeat
+     */
+    public function remoteDoorControl(Request $request): JsonResponse
+    {
+        try {
+            $door = $request->input('door', '0'); // 0=entry, 1=exit, 2=both
+            $duration = $request->input('duration', 5); // seconds
+            $action = $request->input('action', 'open'); // open, close, alarm
+            
+            // Validate inputs
+            if (!in_array($door, ['0', '1', '2'])) {
+                return response()->json(['error' => 'Invalid door selection'], 400);
+            }
+            
+            if ($duration < 1 || $duration > 30) {
+                return response()->json(['error' => 'Duration must be between 1-30 seconds'], 400);
+            }
+            
+            // Determine AcsRes based on action
+            $acsRes = match($action) {
+                'open' => $door === '2' ? '100' : '1', // 100 = fully open both, 1 = open specific
+                'close' => '3',
+                'alarm' => '2',
+                default => '1'
+            };
+            
+            // Store the command for the next heartbeat to pick up
+            $command = [
+                'action' => $action,
+                'door' => $door,
+                'duration' => $duration,
+                'acsRes' => $acsRes,
+                'actIndex' => $door === '2' ? '0' : $door, // For fully open, use 0
+                'timestamp' => now()->toISOString(),
+                'voice' => $this->getDoorActionVoice($action, $door),
+                'user_ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'command_id' => uniqid('cmd_', true)
+            ];
+            
+            Cache::put('remote_door_command', $command, 60); // Expires in 60 seconds
+            
+            // Store the queued command in database for audit trail
+            $this->storeDoorControlQueue($command, $request);
+            
+            Log::info('Remote door control command queued', [
+                'command' => $command,
+                'user_ip' => $request->ip()
+            ]);
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Door control command queued successfully',
+                'command' => $command,
+                'expires_in' => 60
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Remote door control error', [
+                'error' => $e->getMessage(),
+                'user_ip' => $request->ip()
+            ]);
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to queue door control command'
+            ], 500);
+        }
+    }
+    
+    /**
+     * Get door control status
+     */
+    public function doorStatus(): JsonResponse
+    {
+        $pendingCommand = Cache::get('remote_door_command');
+        
+        return response()->json([
+            'has_pending_command' => $pendingCommand !== null,
+            'pending_command' => $pendingCommand,
+            'cache_ttl' => $pendingCommand ? Cache::get('remote_door_command_ttl') : null
+        ]);
+    }
+    
+    /**
+     * Get voice message for door action
+     */
+    private function getDoorActionVoice(string $action, string $door): string
+    {
+        $doorName = match($door) {
+            '0' => 'entry door',
+            '1' => 'exit door', 
+            '2' => 'both doors',
+            default => 'door'
+        };
+        
+        return match($action) {
+            'open' => "Opening {$doorName}",
+            'close' => "Closing {$doorName}",
+            'alarm' => "Alarm activated",
+            default => "Door control activated"
+        };
+    }
+    
+    /**
+     * Store door control command queue in database for audit trail
+     */
+    private function storeDoorControlQueue(array $command, Request $request): void
+    {
+        try {
+            // Create a new EGateRequest record for the queued command
+            EGateRequest::create([
+                'method' => 'DoorControl',
+                'type' => 'remote_queue',
+                'serial' => 'WEB_INTERFACE',
+                'device_id' => 'WEB_INTERFACE',
+                'mac_address' => null,
+                'ip_address' => $request->ip(),
+                'reader' => $command['door'],
+                'source' => 'web_interface',
+                'status' => 'queued',
+                'data' => json_encode($command),
+                'response_status' => 'processing',
+                'response_data' => [
+                    'door_control' => [
+                        'action' => $command['action'],
+                        'door' => $command['door'],
+                        'duration' => $command['duration'],
+                        'queued_at' => now()->toISOString(),
+                        'expires_at' => now()->addSeconds(60)->toISOString(),
+                        'command_id' => $command['command_id'],
+                        'user_ip' => $command['user_ip'],
+                        'user_agent' => $command['user_agent']
+                    ],
+                    'timestamp' => now()->toISOString()
+                ]
+            ]);
+            
+            Log::info('Door control command queue stored in database', [
+                'command_id' => $command['command_id'],
+                'user_ip' => $request->ip()
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to store door control queue', [
+                'error' => $e->getMessage(),
+                'command_id' => $command['command_id'] ?? 'unknown',
+                'user_ip' => $request->ip()
+            ]);
+        }
+    }
+    
+    /**
+     * Store door control command execution in database for history tracking
+     */
+    private function storeDoorControlExecution(array $command, EGateRequest $egateRequest): void
+    {
+        try {
+            // Create a new EGateRequest record specifically for the door control execution
+            EGateRequest::create([
+                'method' => 'DoorControl',
+                'type' => 'remote_execution',
+                'serial' => $egateRequest->serial,
+                'device_id' => $egateRequest->device_id,
+                'mac_address' => $egateRequest->mac_address,
+                'ip_address' => $egateRequest->ip_address,
+                'reader' => $command['door'],
+                'source' => 'web_interface',
+                'status' => 'executed',
+                'data' => json_encode($command),
+                'response_status' => 'success',
+                'response_data' => [
+                    'door_control' => [
+                        'action' => $command['action'],
+                        'door' => $command['door'],
+                        'duration' => $command['duration'],
+                        'executed_at' => now()->toISOString(),
+                        'executed_via' => 'heartbeat',
+                        'original_request_id' => $egateRequest->id,
+                        'command_id' => $command['command_id'] ?? null
+                    ],
+                    'timestamp' => now()->toISOString()
+                ]
+            ]);
+            
+            Log::info('Door control execution stored in database', [
+                'command' => $command,
+                'original_request_id' => $egateRequest->id
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to store door control execution', [
+                'error' => $e->getMessage(),
+                'command' => $command,
+                'original_request_id' => $egateRequest->id
+            ]);
+        }
     }
 }

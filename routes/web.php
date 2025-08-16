@@ -20,6 +20,12 @@ Route::prefix('logs')->group(function () {
     Route::get('/{egateRequest}', [LogsController::class, 'show'])->name('logs.show');
 });
 
+// Door control routes
+Route::prefix('door')->group(function () {
+    Route::post('/open', [EGateController::class, 'remoteDoorControl'])->name('door.open');
+    Route::get('/status', [EGateController::class, 'doorStatus'])->name('door.status');
+});
+
 // Alternative route for logs (as requested)
 Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
 

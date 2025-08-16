@@ -18,6 +18,14 @@
                         <p class="mt-2 text-sm text-gray-600">Monitor and analyze access control requests from eGate devices</p>
                     </div>
                     <div class="flex space-x-3">
+                        <!-- Door Control Button -->
+                        <button onclick="openDoorControlModal()" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                            </svg>
+                            Open Door
+                        </button>
                         <a href="{{ route('logs.export') }}?{{ request()->getQueryString() }}" 
                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
                             Export CSV
@@ -337,5 +345,245 @@
             </div>
         </div>
     </div>
+
+    <!-- Door Control Modal -->
+    <div id="doorControlModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" x-data="{ open: false }">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Door Control</h3>
+                    <button onclick="closeDoorControlModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="doorControlForm" class="space-y-4">
+                    <div>
+                        <label for="door" class="block text-sm font-medium text-gray-700">Door Selection</label>
+                        <select name="door" id="door" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
+                            <option value="0">Entry Door (Lock A)</option>
+                            <option value="1">Exit Door (Lock B)</option>
+                            <option value="2">Both Doors</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="action" class="block text-sm font-medium text-gray-700">Action</label>
+                        <select name="action" id="action" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
+                            <option value="open">Open Door</option>
+                            <option value="close">Close Door</option>
+                            <option value="alarm">Trigger Alarm</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="duration" class="block text-sm font-medium text-gray-700">Duration (seconds)</label>
+                        <input type="number" name="duration" id="duration" value="5" min="1" max="30" 
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm">
+                        <p class="mt-1 text-sm text-gray-500">How long to keep the door open/action active (1-30 seconds)</p>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="closeDoorControlModal()" 
+                                class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                            Execute Command
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Status Display -->
+                <div id="doorControlStatus" class="mt-4 hidden">
+                    <div id="successStatus" class="bg-green-50 border border-green-200 rounded-md p-3 hidden">
+                        <div class="flex">
+                            <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-green-800">Command Queued Successfully</h3>
+                                <div class="mt-2 text-sm text-green-700">
+                                    <p id="statusMessage">The door control command has been queued and will be executed on the next heartbeat from the controller.</p>
+                                    <p class="mt-1 text-xs">Command expires in <span id="expiryTime">60</span> seconds if not executed.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="errorStatus" class="bg-red-50 border border-red-200 rounded-md p-3 hidden">
+                        <div class="flex">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Command Failed</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <p id="errorMessage">Failed to queue door control command.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="executedStatus" class="bg-blue-50 border border-blue-200 rounded-md p-3 hidden">
+                        <div class="flex">
+                            <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 1.414L10.586 9.5H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800">Command Executed</h3>
+                                <div class="mt-2 text-sm text-blue-700">
+                                    <p>The door control command has been successfully executed by the controller.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openDoorControlModal() {
+            document.getElementById('doorControlModal').classList.remove('hidden');
+            hideAllStatusMessages();
+        }
+        
+        function hideAllStatusMessages() {
+            document.getElementById('doorControlStatus').classList.add('hidden');
+            document.getElementById('successStatus').classList.add('hidden');
+            document.getElementById('errorStatus').classList.add('hidden');
+            document.getElementById('executedStatus').classList.add('hidden');
+        }
+        
+        function showStatusMessage(type, message = null) {
+            hideAllStatusMessages();
+            document.getElementById('doorControlStatus').classList.remove('hidden');
+            
+            if (type === 'success') {
+                document.getElementById('successStatus').classList.remove('hidden');
+                if (message) document.getElementById('statusMessage').textContent = message;
+            } else if (type === 'error') {
+                document.getElementById('errorStatus').classList.remove('hidden');
+                if (message) document.getElementById('errorMessage').textContent = message;
+            } else if (type === 'executed') {
+                document.getElementById('executedStatus').classList.remove('hidden');
+            }
+        }
+        
+        function closeDoorControlModal() {
+            document.getElementById('doorControlModal').classList.add('hidden');
+        }
+        
+        // Handle form submission
+        document.getElementById('doorControlForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'Executing...';
+            
+            try {
+                const response = await fetch('{{ route("door.open") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        door: formData.get('door'),
+                        action: formData.get('action'),
+                        duration: parseInt(formData.get('duration'))
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Show success message
+                    showStatusMessage('success', data.message);
+                    
+                    // Start countdown
+                    let timeLeft = data.expires_in || 60;
+                    const countdownElement = document.getElementById('expiryTime');
+                    const countdown = setInterval(() => {
+                        timeLeft--;
+                        countdownElement.textContent = timeLeft;
+                        if (timeLeft <= 0) {
+                            clearInterval(countdown);
+                            countdownElement.textContent = 'expired';
+                        }
+                    }, 1000);
+                    
+                    // Start monitoring for command execution
+                    monitorCommandExecution();
+                    
+                } else {
+                    showStatusMessage('error', data.message || 'Failed to queue door control command');
+                }
+            } catch (error) {
+                showStatusMessage('error', 'Failed to communicate with server');
+                console.error('Door control error:', error);
+            } finally {
+                // Reset button
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }
+        });
+        
+        // Monitor command execution status
+        function monitorCommandExecution() {
+            let attempts = 0;
+            const maxAttempts = 60; // Monitor for 60 seconds
+            
+            const monitor = setInterval(async () => {
+                attempts++;
+                
+                try {
+                    const response = await fetch('{{ route("door.status") }}', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // If no pending command, it means it was executed
+                    if (!data.has_pending_command) {
+                        showStatusMessage('executed');
+                        clearInterval(monitor);
+                        return;
+                    }
+                    
+                    // Stop monitoring after max attempts
+                    if (attempts >= maxAttempts) {
+                        clearInterval(monitor);
+                    }
+                    
+                } catch (error) {
+                    console.error('Error monitoring command execution:', error);
+                    if (attempts >= maxAttempts) {
+                        clearInterval(monitor);
+                    }
+                }
+            }, 1000); // Check every second
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('doorControlModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDoorControlModal();
+            }
+        });
+    </script>
 </body>
 </html>
