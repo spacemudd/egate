@@ -30,7 +30,7 @@ return [
     | Additional security configuration options for the EGate system.
     |
     */
-    'enable_encryption' => env('EGATE_ENABLE_ENCRYPTION', false),
+    'enable_encryption' => env('EGATE_ENABLE_ENCRYPTION', true),
     'log_encrypted_requests' => env('EGATE_LOG_ENCRYPTED_REQUESTS', true),
     'max_payload_size' => 2048, // Maximum encrypted payload size in bytes
 ];
