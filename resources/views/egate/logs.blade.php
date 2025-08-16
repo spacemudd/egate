@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>eGate Logs - Access Control System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -491,19 +492,29 @@
             submitButton.textContent = 'Executing...';
             
             try {
+                // Get CSRF token from meta tag
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                
+                // Prepare form data
+                const requestData = new FormData();
+                requestData.append('_token', csrfToken);
+                requestData.append('door', formData.get('door'));
+                requestData.append('action', formData.get('action'));
+                requestData.append('duration', formData.get('duration'));
+                
                 const response = await fetch('{{ route("door.open") }}', {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                     },
-                    body: JSON.stringify({
-                        door: formData.get('door'),
-                        action: formData.get('action'),
-                        duration: parseInt(formData.get('duration'))
-                    })
+                    body: requestData
                 });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Server error' }));
+                    throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+                }
                 
                 const data = await response.json();
                 
@@ -530,7 +541,7 @@
                     showStatusMessage('error', data.message || 'Failed to queue door control command');
                 }
             } catch (error) {
-                showStatusMessage('error', 'Failed to communicate with server');
+                showStatusMessage('error', error.message || 'Failed to communicate with server');
                 console.error('Door control error:', error);
             } finally {
                 // Reset button
