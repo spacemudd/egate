@@ -556,7 +556,8 @@ class EGateController extends Controller
                 
                 if ($apiResponse['allow']) {
                     $result['granted'] = true;
-                    $result['name'] = 'Authorized User';
+                    // Use the actual user name from API if available
+                    $result['name'] = isset($apiResponse['user']['name']) ? $apiResponse['user']['name'] : 'Authorized User';
                     $result['voice'] = 'Welcome';
                     $result['reason'] = 'API validation successful';
                     
@@ -630,10 +631,17 @@ class EGateController extends Controller
                 'uuid_length' => strlen($qrCodeValue)
             ]);
             
-            $response = Http::timeout(10)->get($apiUrl, [
-                'secret' => $secret,
-                'qr_code_value' => $qrCodeValue
-            ]);
+            // Try POST request first (default method)
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'User-Agent' => 'EGate-Laravel-Client/1.0'
+                ])
+                ->post($apiUrl, [
+                    'secret' => $secret,
+                    'qr_code_value' => $qrCodeValue
+                ]);
             
             if ($response->successful()) {
                 $responseData = $response->json();
@@ -653,18 +661,66 @@ class EGateController extends Controller
                     'response' => $responseData
                 ];
             } else {
-                Log::error('API call failed', [
-                    'status_code' => $response->status(),
-                    'response_body' => $response->body()
-                ]);
-                
-                return [
-                    'success' => false,
-                    'error' => 'API returned status: ' . $response->status(),
-                    'status_code' => $response->status(),
-                    'response_body' => $response->body(),
-                    'response_headers' => $response->headers()
-                ];
+                // If POST failed with 405 (Method Not Allowed), try GET
+                if ($response->status() === 405) {
+                    Log::info('POST request failed with 405, trying GET method');
+                    
+                    $getResponse = Http::timeout(10)
+                        ->withHeaders([
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/json',
+                            'User-Agent' => 'EGate-Laravel-Client/1.0'
+                        ])
+                        ->get($apiUrl, [
+                            'secret' => $secret,
+                            'qr_code_value' => $qrCodeValue
+                        ]);
+                    
+                    if ($getResponse->successful()) {
+                        $responseData = $getResponse->json();
+                        
+                        Log::info('API response received via GET', [
+                            'status_code' => $getResponse->status(),
+                            'response' => $responseData
+                        ]);
+                        
+                        // Validate response structure
+                        if (!isset($responseData['allow'])) {
+                            throw new \Exception('Invalid API response: missing allow field');
+                        }
+                        
+                        return [
+                            'success' => true,
+                            'response' => $responseData
+                        ];
+                    } else {
+                        Log::error('GET API call also failed', [
+                            'status_code' => $getResponse->status(),
+                            'response_body' => $getResponse->body()
+                        ]);
+                        
+                        return [
+                            'success' => false,
+                            'error' => 'API returned status: ' . $getResponse->status() . ' (tried both POST and GET)',
+                            'status_code' => $getResponse->status(),
+                            'response_body' => $getResponse->body(),
+                            'response_headers' => $getResponse->headers()
+                        ];
+                    }
+                } else {
+                    Log::error('API call failed', [
+                        'status_code' => $response->status(),
+                        'response_body' => $response->body()
+                    ]);
+                    
+                    return [
+                        'success' => false,
+                        'error' => 'API returned status: ' . $response->status(),
+                        'status_code' => $response->status(),
+                        'response_body' => $response->body(),
+                        'response_headers' => $response->headers()
+                    ];
+                }
             }
             
         } catch (\Exception $e) {
