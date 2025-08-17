@@ -529,20 +529,25 @@ class EGateController extends Controller
         ];
 
         try {
-            // Decode base64 QR code data
+            // Decode base64 QR code data to get the actual UUID
             $decodedCard = base64_decode($card, true);
             
             // If base64 decode fails, try using the card data directly
             if ($decodedCard === false) {
                 $decodedCard = $card;
+                Log::warning('Base64 decode failed, using original card data', [
+                    'original' => $card
+                ]);
             }
 
             Log::info('QR Code processing started', [
-                'original' => $card, 
-                'decoded' => $decodedCard
+                'original_base64' => $card, 
+                'decoded_uuid' => $decodedCard,
+                'original_length' => strlen($card),
+                'decoded_length' => strlen($decodedCard)
             ]);
 
-            // Call external API to validate QR code
+            // Call external API to validate QR code using the decoded UUID
             $apiResult = $this->validateQRCodeWithAPI($decodedCard);
             
             if ($apiResult['success']) {
@@ -601,9 +606,10 @@ class EGateController extends Controller
             $apiUrl = 'https://eco-app.eco-propertiesglobal.co.uk/api/gate';
             $secret = 'xkjalskdjalsd';
             
-            Log::info('Making API call to validate QR code', [
+            Log::info('Making API call to validate decoded UUID', [
                 'url' => $apiUrl,
-                'qr_code_value' => $qrCodeValue
+                'decoded_uuid' => $qrCodeValue,
+                'uuid_length' => strlen($qrCodeValue)
             ]);
             
             $response = Http::timeout(10)->get($apiUrl, [
@@ -643,7 +649,7 @@ class EGateController extends Controller
         } catch (\Exception $e) {
             Log::error('API call exception', [
                 'error' => $e->getMessage(),
-                'qr_code_value' => $qrCodeValue
+                'decoded_uuid' => $qrCodeValue
             ]);
             
             return [
