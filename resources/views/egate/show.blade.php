@@ -305,6 +305,167 @@
             </div>
             @endif
 
+            <!-- API Validation Results -->
+            @php
+                $apiValidationData = null;
+                if ($egateRequest->response_data && is_array($egateRequest->response_data)) {
+                    // Check if this was a QR code request with API validation
+                    if (isset($egateRequest->response_data['access_result'])) {
+                        $apiValidationData = $egateRequest->response_data;
+                    }
+                }
+                
+                // Also check if there's API response data in audit context
+                $apiResponseData = null;
+                if ($egateRequest->response_data && 
+                    isset($egateRequest->response_data['audit_context']) && 
+                    is_array($egateRequest->response_data['audit_context'])) {
+                    
+                    // Look for API response in logs
+                    $auditData = $egateRequest->response_data['audit_context'];
+                    if (isset($auditData['api_response'])) {
+                        $apiResponseData = $auditData['api_response'];
+                    }
+                }
+            @endphp
+
+            @if($apiValidationData || ($egateRequest->type == '1' || $egateRequest->type == '9') && $egateRequest->card)
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        <span class="inline-flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            API Validation Results
+                        </span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 gap-6">
+                        <!-- QR Code Information -->
+                        @if($egateRequest->card)
+                        <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                            <h4 class="text-sm font-medium text-blue-900 mb-3">QR Code Information</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <dt class="text-xs font-medium text-blue-700">Original (Base64)</dt>
+                                    <dd class="mt-1 text-sm text-blue-900 font-mono break-all">{{ $egateRequest->card }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-medium text-blue-700">Decoded UUID</dt>
+                                    <dd class="mt-1 text-sm text-blue-900 font-mono">
+                                        @php
+                                            // Use stored decoded UUID if available, otherwise decode it
+                                            $decodedUuid = null;
+                                            if ($apiValidationData && isset($apiValidationData['access_result']['decoded_uuid'])) {
+                                                $decodedUuid = $apiValidationData['access_result']['decoded_uuid'];
+                                            } else {
+                                                $decodedUuid = base64_decode($egateRequest->card, true);
+                                                if ($decodedUuid === false) {
+                                                    $decodedUuid = $egateRequest->card;
+                                                }
+                                            }
+                                        @endphp
+                                        {{ $decodedUuid }}
+                                    </dd>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- API Call Information -->
+                        @if($egateRequest->card)
+                        <div class="border-l-4 border-purple-500 bg-purple-50 p-4">
+                            <h4 class="text-sm font-medium text-purple-900 mb-3">API Call Details</h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <dt class="text-xs font-medium text-purple-700">API Endpoint</dt>
+                                    <dd class="mt-1 text-sm text-purple-900 font-mono">https://eco-app.eco-propertiesglobal.co.uk/api/gate</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-medium text-purple-700">Parameters</dt>
+                                    <dd class="mt-1 text-sm text-purple-900">
+                                        <code class="bg-purple-100 px-2 py-1 rounded text-xs">
+                                            secret=xkjalskdjalsd&qr_code_value={{ $decodedUuid ?? (base64_decode($egateRequest->card, true) ?: $egateRequest->card) }}
+                                        </code>
+                                    </dd>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- API Response -->
+                        @if($apiValidationData && isset($apiValidationData['access_result']))
+                        @php
+                            $accessResult = $apiValidationData['access_result'];
+                            $isGranted = isset($accessResult['granted']) && $accessResult['granted'];
+                        @endphp
+                        <div class="border-l-4 {{ $isGranted ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50' }} p-4">
+                            <h4 class="text-sm font-medium {{ $isGranted ? 'text-green-900' : 'text-red-900' }} mb-3">
+                                API Validation Result
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <dt class="text-xs font-medium {{ $isGranted ? 'text-green-700' : 'text-red-700' }}">Access Decision</dt>
+                                    <dd class="mt-1">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                            {{ $isGranted ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                            {{ $isGranted ? 'GRANTED' : 'DENIED' }}
+                                        </span>
+                                    </dd>
+                                </div>
+                                @if(isset($accessResult['name']))
+                                <div>
+                                    <dt class="text-xs font-medium {{ $isGranted ? 'text-green-700' : 'text-red-700' }}">User Name</dt>
+                                    <dd class="mt-1 text-sm {{ $isGranted ? 'text-green-900' : 'text-red-900' }}">{{ $accessResult['name'] }}</dd>
+                                </div>
+                                @endif
+                                @if(isset($accessResult['reason']))
+                                <div>
+                                    <dt class="text-xs font-medium {{ $isGranted ? 'text-green-700' : 'text-red-700' }}">Reason</dt>
+                                    <dd class="mt-1 text-sm {{ $isGranted ? 'text-green-900' : 'text-red-900' }}">{{ $accessResult['reason'] }}</dd>
+                                </div>
+                                @endif
+                            </div>
+                            
+                            @if(isset($accessResult['voice']))
+                            <div class="mt-4">
+                                <dt class="text-xs font-medium {{ $isGranted ? 'text-green-700' : 'text-red-700' }}">Voice Message</dt>
+                                <dd class="mt-1 text-sm {{ $isGranted ? 'text-green-900' : 'text-red-900' }} italic">"{{ $accessResult['voice'] }}"</dd>
+                            </div>
+                            @endif
+                        </div>
+                        @endif
+
+                        <!-- Raw API Response (if available) -->
+                        @if(($apiValidationData && isset($apiValidationData['access_result']['api_response'])) || $apiResponseData)
+                        <div class="border-l-4 border-gray-500 bg-gray-50 p-4">
+                            <h4 class="text-sm font-medium text-gray-900 mb-3">Raw API Response</h4>
+                            <div class="bg-white p-3 rounded-md border">
+                                <pre class="text-xs text-gray-800 overflow-x-auto">{{ json_encode($apiValidationData['access_result']['api_response'] ?? $apiResponseData, JSON_PRETTY_PRINT) }}</pre>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- Fallback Information -->
+                        @if($apiValidationData && isset($apiValidationData['access_result']['reason']) && str_contains($apiValidationData['access_result']['reason'], 'fallback'))
+                        <div class="border-l-4 border-yellow-500 bg-yellow-50 p-4">
+                            <div class="flex">
+                                <svg class="w-5 h-5 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div>
+                                    <h4 class="text-sm font-medium text-yellow-900">API Fallback Used</h4>
+                                    <p class="text-sm text-yellow-700 mt-1">The external API was unavailable, so the system used local pattern matching as a fallback.</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- Raw Request Data -->
             <div class="bg-white shadow rounded-lg">
                 <div class="px-4 py-5 sm:p-6">

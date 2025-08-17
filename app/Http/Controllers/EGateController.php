@@ -575,6 +575,11 @@ class EGateController extends Controller
                         'api_response' => $apiResponse
                     ]);
                 }
+                
+                // Store API response data for display in logs
+                $result['api_response'] = $apiResponse;
+                $result['decoded_uuid'] = $decodedCard;
+                $result['original_qr_code'] = $card;
             } else {
                 // API call failed, fall back to old logic for backward compatibility
                 Log::warning('API validation failed, falling back to local patterns', [
