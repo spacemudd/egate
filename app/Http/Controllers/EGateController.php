@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class EGateController extends Controller
 {
@@ -515,7 +516,7 @@ class EGateController extends Controller
     }
 
     /**
-     * Evaluate QR code access patterns
+     * Evaluate QR code access patterns by calling external API
      */
     private function evaluateQRCode(string $card): array
     {
@@ -536,53 +537,174 @@ class EGateController extends Controller
                 $decodedCard = $card;
             }
 
-            Log::info('QR Code decoded', ['original' => $card, 'decoded' => $decodedCard]);
+            Log::info('QR Code processing started', [
+                'original' => $card, 
+                'decoded' => $decodedCard
+            ]);
 
-            // Check for programmers-allow-{name} pattern
-            if (preg_match('/^programmers-allow-(.+)$/i', $decodedCard, $matches)) {
-                $name = trim($matches[1]);
+            // Call external API to validate QR code
+            $apiResult = $this->validateQRCodeWithAPI($decodedCard);
+            
+            if ($apiResult['success']) {
+                // API call was successful, use the response
+                $apiResponse = $apiResult['response'];
                 
-                if (!empty($name)) {
+                if ($apiResponse['allow']) {
                     $result['granted'] = true;
-                    $result['name'] = ucfirst($name);
-                    // Voice message is just "Bobo" - no name included
-                    $result['voice'] = "Bobo";
-                    $result['reason'] = "Programmer access granted for {$name}";
+                    $result['name'] = 'Authorized User';
+                    $result['voice'] = 'Welcome';
+                    $result['reason'] = 'API validation successful';
                     
-                    // Add debugging for voice message
-                    Log::info('Voice message being sent', [
-                        'voice' => $result['voice'], 
-                        'length' => strlen($result['voice']),
-                        'name' => $name
+                    Log::info('Access granted via API', [
+                        'qr_code' => $decodedCard,
+                        'api_response' => $apiResponse
                     ]);
+                } else {
+                    $result['granted'] = false;
+                    $result['name'] = 'Access Denied';
+                    $result['voice'] = 'Access denied';
+                    $result['reason'] = $apiResponse['message'] ?? 'API denied access';
                     
-                    Log::info('Access granted for programmer', ['name' => $name, 'pattern' => 'allow']);
-                    return $result;
+                    Log::info('Access denied via API', [
+                        'qr_code' => $decodedCard,
+                        'api_response' => $apiResponse
+                    ]);
                 }
-            }
-
-            // Check for programmers-deny-{name} pattern
-            if (preg_match('/^programmers-deny-(.+)$/i', $decodedCard, $matches)) {
-                $name = trim($matches[1]);
+            } else {
+                // API call failed, fall back to old logic for backward compatibility
+                Log::warning('API validation failed, falling back to local patterns', [
+                    'qr_code' => $decodedCard,
+                    'api_error' => $apiResult['error']
+                ]);
                 
-                $result['granted'] = false;
-                $result['name'] = ucfirst($name);
-                $result['voice'] = "Access denied for {$name}";
-                $result['reason'] = "Programmer access denied for {$name}";
-                
-                Log::info('Access denied for programmer', ['name' => $name, 'pattern' => 'deny']);
-                return $result;
+                $result = $this->evaluateQRCodeLocal($decodedCard);
             }
-
-            // For other QR codes, log and deny
-            Log::info('QR code does not match programmer patterns', ['decoded' => $decodedCard]);
-            $result['reason'] = 'QR code does not match required patterns';
             
         } catch (\Exception $e) {
-            Log::error('Error processing QR code', ['card' => $card, 'error' => $e->getMessage()]);
-            $result['reason'] = 'Error processing QR code';
+            Log::error('Error processing QR code', [
+                'card' => $card, 
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            $result['reason'] = 'Error processing QR code: ' . $e->getMessage();
         }
 
+        return $result;
+    }
+
+    /**
+     * Validate QR code with external API
+     */
+    private function validateQRCodeWithAPI(string $qrCodeValue): array
+    {
+        try {
+            $apiUrl = 'https://eco-app.eco-propertiesglobal.co.uk/api/gate';
+            $secret = 'xkjalskdjalsd';
+            
+            Log::info('Making API call to validate QR code', [
+                'url' => $apiUrl,
+                'qr_code_value' => $qrCodeValue
+            ]);
+            
+            $response = Http::timeout(10)->get($apiUrl, [
+                'secret' => $secret,
+                'qr_code_value' => $qrCodeValue
+            ]);
+            
+            if ($response->successful()) {
+                $responseData = $response->json();
+                
+                Log::info('API response received', [
+                    'status_code' => $response->status(),
+                    'response' => $responseData
+                ]);
+                
+                // Validate response structure
+                if (!isset($responseData['allow'])) {
+                    throw new \Exception('Invalid API response: missing allow field');
+                }
+                
+                return [
+                    'success' => true,
+                    'response' => $responseData
+                ];
+            } else {
+                Log::error('API call failed', [
+                    'status_code' => $response->status(),
+                    'response_body' => $response->body()
+                ]);
+                
+                return [
+                    'success' => false,
+                    'error' => 'API returned status: ' . $response->status()
+                ];
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('API call exception', [
+                'error' => $e->getMessage(),
+                'qr_code_value' => $qrCodeValue
+            ]);
+            
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Fallback QR code evaluation using local patterns (for backward compatibility)
+     */
+    private function evaluateQRCodeLocal(string $decodedCard): array
+    {
+        $result = [
+            'granted' => false,
+            'name' => null,
+            'voice' => null,
+            'reason' => 'Invalid QR code'
+        ];
+
+        // Check for programmers-allow-{name} pattern
+        if (preg_match('/^programmers-allow-(.+)$/i', $decodedCard, $matches)) {
+            $name = trim($matches[1]);
+            
+            if (!empty($name)) {
+                $result['granted'] = true;
+                $result['name'] = ucfirst($name);
+                $result['voice'] = "Bobo";
+                $result['reason'] = "Programmer access granted for {$name} (fallback)";
+                
+                Log::info('Access granted for programmer (fallback)', [
+                    'name' => $name, 
+                    'pattern' => 'allow'
+                ]);
+                return $result;
+            }
+        }
+
+        // Check for programmers-deny-{name} pattern
+        if (preg_match('/^programmers-deny-(.+)$/i', $decodedCard, $matches)) {
+            $name = trim($matches[1]);
+            
+            $result['granted'] = false;
+            $result['name'] = ucfirst($name);
+            $result['voice'] = "Access denied for {$name}";
+            $result['reason'] = "Programmer access denied for {$name} (fallback)";
+            
+            Log::info('Access denied for programmer (fallback)', [
+                'name' => $name, 
+                'pattern' => 'deny'
+            ]);
+            return $result;
+        }
+
+        // For other QR codes, log and deny
+        Log::info('QR code does not match programmer patterns (fallback)', [
+            'decoded' => $decodedCard
+        ]);
+        $result['reason'] = 'QR code does not match required patterns (fallback)';
+        
         return $result;
     }
 
