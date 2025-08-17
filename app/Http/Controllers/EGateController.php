@@ -588,6 +588,19 @@ class EGateController extends Controller
                 ]);
                 
                 $result = $this->evaluateQRCodeLocal($decodedCard);
+                
+                // Store API failure information for display in logs
+                $result['api_failure'] = [
+                    'error' => $apiResult['error'],
+                    'attempted_url' => 'https://eco-app.eco-propertiesglobal.co.uk/api/gate',
+                    'attempted_params' => [
+                        'secret' => 'xkjalskdjalsd',
+                        'qr_code_value' => $decodedCard
+                    ],
+                    'fallback_used' => true
+                ];
+                $result['decoded_uuid'] = $decodedCard;
+                $result['original_qr_code'] = $card;
             }
             
         } catch (\Exception $e) {
@@ -647,7 +660,10 @@ class EGateController extends Controller
                 
                 return [
                     'success' => false,
-                    'error' => 'API returned status: ' . $response->status()
+                    'error' => 'API returned status: ' . $response->status(),
+                    'status_code' => $response->status(),
+                    'response_body' => $response->body(),
+                    'response_headers' => $response->headers()
                 ];
             }
             

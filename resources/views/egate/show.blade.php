@@ -447,6 +447,43 @@
                         </div>
                         @endif
 
+                        <!-- API Failure Details (if API failed) -->
+                        @if($apiValidationData && isset($apiValidationData['access_result']['api_failure']))
+                        @php
+                            $apiFailure = $apiValidationData['access_result']['api_failure'];
+                        @endphp
+                        <div class="border-l-4 border-red-500 bg-red-50 p-4">
+                            <h4 class="text-sm font-medium text-red-900 mb-3">
+                                <span class="inline-flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    API Call Failed
+                                </span>
+                            </h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <dt class="text-xs font-medium text-red-700">Error Message</dt>
+                                    <dd class="mt-1 text-sm text-red-900">{{ $apiFailure['error'] }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-medium text-red-700">Attempted URL</dt>
+                                    <dd class="mt-1 text-sm text-red-900 font-mono">{{ $apiFailure['attempted_url'] }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-xs font-medium text-red-700">Attempted Parameters</dt>
+                                    <dd class="mt-1 text-sm text-red-900">
+                                        <code class="bg-red-100 px-2 py-1 rounded text-xs">
+                                            @foreach($apiFailure['attempted_params'] as $key => $value)
+                                                {{ $key }}={{ $value }}{{ !$loop->last ? '&' : '' }}
+                                            @endforeach
+                                        </code>
+                                    </dd>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
                         <!-- Fallback Information -->
                         @if($apiValidationData && isset($apiValidationData['access_result']['reason']) && str_contains($apiValidationData['access_result']['reason'], 'fallback'))
                         <div class="border-l-4 border-yellow-500 bg-yellow-50 p-4">
