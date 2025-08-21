@@ -30,7 +30,13 @@ Route::prefix('door')->group(function () {
 Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
 
 // ZkTeco webhook endpoint
-Route::any('/webhook/fp', [EGateController::class, 'handleZkTecoWebhook']);
+Route::any('/webhooks/fp', [EGateController::class, 'handleZkTecoWebhook']);
+
+// ZKTeco iClock endpoint for attendance punches
+Route::get('/iclock/cdata', function (Illuminate\Http\Request $request) {
+    \Log::info('[ZKTeco] iClock Request:', $request->all());
+    return response("OK"); // must return plain OK
+});
 
 // Test routes for simulating eGate requests (remove in production)
 Route::prefix('test')->group(function () {
