@@ -14,7 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Disable CSRF protection for door control routes and eGate API endpoints
         $middleware->validateCsrfTokens(except: [
             'door/*',
-            'data/*'
+            'data/*',
+            'webhook/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
