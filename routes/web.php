@@ -34,16 +34,63 @@ Route::any('/webhooks/fp', [EGateController::class, 'handleZkTecoWebhook']);
 
 // ZKTeco iClock endpoints
 Route::match(['GET', 'POST'], '/iclock/cdata', function (Illuminate\Http\Request $request) {
+    $rawBody = $request->getContent();
+    $table = $request->query('table');
+    $serial = $request->query('SN');
+
+    $lines = [];
+    $parsedRecords = [];
+    $processedCount = 0;
+
+    if (!empty($rawBody)) {
+        $lines = preg_split("/(\r\n|\n|\r)/", trim($rawBody));
+        foreach ($lines as $line) {
+            if (trim($line) === '') {
+                continue;
+            }
+            $processedCount++;
+
+            // Try to parse ATTLOG/FACELOG style records
+            $parts = explode("\t", $line);
+            if (count($parts) < 2) {
+                $parts = preg_split('/\s+/', $line);
+            }
+
+            $record = [
+                'raw' => $line,
+                'fields' => $parts,
+            ];
+
+            // Heuristic mapping for ATTLOG
+            if (strtoupper((string) $table) === 'ATTLOG') {
+                $record['mapped'] = [
+                    'pin' => $parts[0] ?? null,
+                    'datetime' => $parts[1] ?? null,
+                    'status' => $parts[2] ?? null,
+                    'verify' => $parts[3] ?? null,
+                    'workcode' => $parts[4] ?? null,
+                ];
+            }
+
+            $parsedRecords[] = $record;
+        }
+    }
+
     \Log::info('[ZKTeco] /iclock/cdata', [
         'method' => $request->method(),
         'url' => $request->fullUrl(),
         'ip' => $request->ip(),
         'query' => $request->query(),
         'body' => $request->all(),
-        'raw_body' => $request->getContent(),
+        'raw_body' => $rawBody,
+        'table' => $table,
+        'serial' => $serial,
+        'record_count' => $processedCount,
+        'records' => $parsedRecords,
         'headers' => $request->headers->all(),
         'timestamp' => now()->toISOString(),
     ]);
+
     return response('OK', 200)->header('Content-Type', 'text/plain');
 });
 
@@ -62,6 +109,25 @@ Route::match(['GET', 'POST'], '/iclock/verify', function (Illuminate\Http\Reques
 });
 
 Route::match(['GET', 'POST'], '/iclock/getrequest', function (Illuminate\Http\Request $request) {
+    $sn = $request->query('SN');
+
+    $responseText = 'GET OPTIONS Stamp=0';
+    if (!empty($sn)) {
+        $responseText = "GET OPTION FROM: {$sn}\n" .
+            "Stamp=0\n" .
+            "ATTLOGStamp=0\n" .
+            "OPERLOGStamp=0\n" .
+            "ATTPHOTOStamp=0\n" .
+            "ErrorDelay=30\n" .
+            "Delay=10\n" .
+            "TransTimes=00:00;23:59\n" .
+            "TransInterval=1\n" .
+            "TransFlag=TransData AttLog OpLog EnrollUser ChgUser EnrollFP ChgFP FPImag\n" .
+            "TimeZone=0\n" .
+            "Realtime=1\n" .
+            "Encrypt=None";
+    }
+
     \Log::info('[ZKTeco] /iclock/getrequest', [
         'method' => $request->method(),
         'url' => $request->fullUrl(),
@@ -71,9 +137,10 @@ Route::match(['GET', 'POST'], '/iclock/getrequest', function (Illuminate\Http\Re
         'raw_body' => $request->getContent(),
         'headers' => $request->headers->all(),
         'timestamp' => now()->toISOString(),
+        'response_preview' => substr($responseText, 0, 120),
     ]);
-    // Force upload of all logs
-    return response('GET OPTIONS Stamp=0', 200)->header('Content-Type', 'text/plain');
+
+    return response($responseText, 200)->header('Content-Type', 'text/plain');
 });
 
 // Test routes for simulating eGate requests (remove in production)
