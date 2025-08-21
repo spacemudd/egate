@@ -12,6 +12,25 @@ use Illuminate\Support\Facades\Http;
 class EGateController extends Controller
 {
     /**
+     * Handle ZkTeco webhooks
+     */
+    public function handleZkTecoWebhook(Request $request): JsonResponse
+    {
+        // Log the entire request with [ZkTeco] prefix
+        Log::info('[ZkTeco] Webhook received', [
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'ip' => $request->ip(),
+            'query' => $request->query(),
+            'body' => $request->all(),
+            'headers' => $request->headers->all(),
+            'timestamp' => now()->toISOString(),
+        ]);
+        
+        // Return a simple success response
+        return response()->json(['status' => 'success', 'message' => 'Webhook received']);
+    }
+    /**
      * Handle eGate requests with AES128 decryption support
      */
     public function handleRequest(Request $request): JsonResponse

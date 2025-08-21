@@ -29,6 +29,9 @@ Route::prefix('door')->group(function () {
 // Alternative route for logs (as requested)
 Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
 
+// ZkTeco webhook endpoint
+Route::any('/webhooks/fp', [EGateController::class, 'handleZkTecoWebhook']);
+
 // Test routes for simulating eGate requests (remove in production)
 Route::prefix('test')->group(function () {
     Route::get('/heartbeat', function () {
