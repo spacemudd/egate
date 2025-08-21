@@ -72,7 +72,8 @@ Route::match(['GET', 'POST'], '/iclock/getrequest', function (Illuminate\Http\Re
         'headers' => $request->headers->all(),
         'timestamp' => now()->toISOString(),
     ]);
-    return response('OK', 200)->header('Content-Type', 'text/plain');
+    // Force upload of all logs
+    return response('GET OPTIONS Stamp=0', 200)->header('Content-Type', 'text/plain');
 });
 
 // Test routes for simulating eGate requests (remove in production)
