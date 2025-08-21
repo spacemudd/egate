@@ -30,7 +30,7 @@ Route::prefix('door')->group(function () {
 Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
 
 // ZkTeco webhook endpoint
-Route::any('/webhooks/fp', [EGateController::class, 'handleZkTecoWebhook']);
+Route::any('/webhook/fp', [EGateController::class, 'handleZkTecoWebhook']);
 
 // Test routes for simulating eGate requests (remove in production)
 Route::prefix('test')->group(function () {
