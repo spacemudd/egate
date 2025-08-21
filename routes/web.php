@@ -32,10 +32,47 @@ Route::get('/logs', [LogsController::class, 'index'])->name('logs.index');
 // ZkTeco webhook endpoint
 Route::any('/webhooks/fp', [EGateController::class, 'handleZkTecoWebhook']);
 
-// ZKTeco iClock endpoint for attendance punches
-Route::get('/iclock/cdata', function (Illuminate\Http\Request $request) {
-    \Log::info('[ZKTeco] iClock Request:', $request->all());
-    return response("OK"); // must return plain OK
+// ZKTeco iClock endpoints
+Route::match(['GET', 'POST'], '/iclock/cdata', function (Illuminate\Http\Request $request) {
+    \Log::info('[ZKTeco] /iclock/cdata', [
+        'method' => $request->method(),
+        'url' => $request->fullUrl(),
+        'ip' => $request->ip(),
+        'query' => $request->query(),
+        'body' => $request->all(),
+        'raw_body' => $request->getContent(),
+        'headers' => $request->headers->all(),
+        'timestamp' => now()->toISOString(),
+    ]);
+    return response('OK', 200)->header('Content-Type', 'text/plain');
+});
+
+Route::match(['GET', 'POST'], '/iclock/verify', function (Illuminate\Http\Request $request) {
+    \Log::info('[ZKTeco] /iclock/verify', [
+        'method' => $request->method(),
+        'url' => $request->fullUrl(),
+        'ip' => $request->ip(),
+        'query' => $request->query(),
+        'body' => $request->all(),
+        'raw_body' => $request->getContent(),
+        'headers' => $request->headers->all(),
+        'timestamp' => now()->toISOString(),
+    ]);
+    return response('OK', 200)->header('Content-Type', 'text/plain');
+});
+
+Route::match(['GET', 'POST'], '/iclock/getrequest', function (Illuminate\Http\Request $request) {
+    \Log::info('[ZKTeco] /iclock/getrequest', [
+        'method' => $request->method(),
+        'url' => $request->fullUrl(),
+        'ip' => $request->ip(),
+        'query' => $request->query(),
+        'body' => $request->all(),
+        'raw_body' => $request->getContent(),
+        'headers' => $request->headers->all(),
+        'timestamp' => now()->toISOString(),
+    ]);
+    return response('OK', 200)->header('Content-Type', 'text/plain');
 });
 
 // Test routes for simulating eGate requests (remove in production)
