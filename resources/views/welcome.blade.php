@@ -82,6 +82,21 @@
                                 </p>
                             </div>
                         </div>
+
+                        <div class="scale-100 p-6 bg-white from-gray-700/50 via-transparent rounded-lg shadow-2xl shadow-gray-500/20 flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                            <div>
+                                <h2 class="text-xl font-semibold text-gray-900">ZKTeco Fingerprint Devices</h2>
+                                <p class="mt-4 text-gray-600 text-sm leading-relaxed">
+                                    Monitor connected ZKTeco fingerprint devices in real-time. View device status, 
+                                    connection details, and recent activity from fingerprint scanners.
+                                </p>
+                                <div class="mt-4">
+                                    <a href="{{ route('zkteco.devices') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        View Devices
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex justify-center mt-16 px-6 sm:items-center sm:justify-between">

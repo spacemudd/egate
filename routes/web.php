@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EGateController;
 use App\Http\Controllers\LogsController;
+use App\Http\Controllers\ZKTecoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -76,6 +77,30 @@ Route::match(['GET', 'POST'], '/iclock/cdata', function (Illuminate\Http\Request
         }
     }
 
+    // Update device status in cache
+    if ($serial) {
+        $devices = \Cache::get('zkteco_devices', []);
+        
+        $deviceData = [
+            'serial' => $serial,
+            'ip_address' => $request->ip(),
+            'last_seen' => now()->toISOString(),
+            'device_type' => $request->query('DeviceType', 'att'),
+            'language' => $request->query('language', '69'),
+            'push_version' => $request->query('pushver', '2.4.1'),
+            'options' => $request->query('options', 'all'),
+            'push_options_flag' => $request->query('PushOptionsFlag', '1'),
+            'user_agent' => $request->header('User-Agent', 'Unknown'),
+            'status' => 'online'
+        ];
+        
+        // Update or add device
+        $devices[$serial] = $deviceData;
+        
+        // Store in cache for 1 hour
+        \Cache::put('zkteco_devices', $devices, 3600);
+    }
+
     \Log::info('[ZKTeco] /iclock/cdata', [
         'method' => $request->method(),
         'url' => $request->fullUrl(),
@@ -109,24 +134,7 @@ Route::match(['GET', 'POST'], '/iclock/verify', function (Illuminate\Http\Reques
 });
 
 Route::match(['GET', 'POST'], '/iclock/getrequest', function (Illuminate\Http\Request $request) {
-    $sn = $request->query('SN');
-
     $responseText = 'GET OPTIONS Stamp=0';
-    if (!empty($sn)) {
-        $responseText = "GET OPTION FROM: {$sn}\n" .
-            "Stamp=0\n" .
-            "ATTLOGStamp=0\n" .
-            "OPERLOGStamp=0\n" .
-            "ATTPHOTOStamp=0\n" .
-            "ErrorDelay=30\n" .
-            "Delay=10\n" .
-            "TransTimes=00:00;23:59\n" .
-            "TransInterval=1\n" .
-            "TransFlag=TransData AttLog OpLog EnrollUser ChgUser EnrollFP ChgFP FPImag\n" .
-            "TimeZone=0\n" .
-            "Realtime=1\n" .
-            "Encrypt=None";
-    }
 
     \Log::info('[ZKTeco] /iclock/getrequest', [
         'method' => $request->method(),
@@ -141,6 +149,29 @@ Route::match(['GET', 'POST'], '/iclock/getrequest', function (Illuminate\Http\Re
     ]);
 
     return response($responseText, 200)->header('Content-Type', 'text/plain');
+});
+
+// Catch-all logger for any other iClock endpoints the device may hit
+Route::any('/iclock/{path}', function (Illuminate\Http\Request $request, $path) {
+    \Log::info('[ZKTeco] /iclock/* (catch-all)', [
+        'path' => $path,
+        'method' => $request->method(),
+        'url' => $request->fullUrl(),
+        'ip' => $request->ip(),
+        'query' => $request->query(),
+        'body' => $request->all(),
+        'raw_body' => $request->getContent(),
+        'headers' => $request->headers->all(),
+        'timestamp' => now()->toISOString(),
+    ]);
+    return response('OK', 200)->header('Content-Type', 'text/plain');
+})->where('path', '.*');
+
+// ZKTeco device management routes
+Route::prefix('zkteco')->group(function () {
+    Route::get('/devices', [ZKTecoController::class, 'index'])->name('zkteco.devices');
+    Route::get('/devices/{serial}', [ZKTecoController::class, 'getDeviceDetails'])->name('zkteco.device.details');
+    Route::post('/devices/clear-cache', [ZKTecoController::class, 'clearCache'])->name('zkteco.clear-cache');
 });
 
 // Test routes for simulating eGate requests (remove in production)
