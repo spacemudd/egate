@@ -116,7 +116,8 @@ Route::match(['GET', 'POST'], '/iclock/cdata', function (Illuminate\Http\Request
         'timestamp' => now()->toISOString(),
     ]);
 
-    return response('OK', 200)->header('Content-Type', 'text/plain');
+    $xml = '<?xml version="1.0" encoding="UTF-8"?><Response><Status>OK</Status></Response>';
+    return response($xml, 200)->header('Content-Type', 'application/xml');
 });
 
 Route::match(['GET', 'POST'], '/iclock/verify', function (Illuminate\Http\Request $request) {
