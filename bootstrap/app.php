@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'door/*',
             'data/*',
             'webhook/*',
+            'iclock/*',
+            'icdata/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
