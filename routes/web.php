@@ -36,8 +36,8 @@ Route::any('/webhooks/fp', [EGateController::class, 'handleZkTecoWebhook']);
 // ZKTeco iClock endpoints
 Route::match(['GET', 'POST'], '/iclock/cdata', function (Illuminate\Http\Request $request) {
     $rawBody = $request->getContent();
-    $table = $request->query('table');
-    $serial = $request->query('SN');
+    $table = $request->input('table', $request->query('table'));
+    $serial = $request->input('SN', $request->query('SN'));
 
     $lines = [];
     $parsedRecords = [];
@@ -85,11 +85,11 @@ Route::match(['GET', 'POST'], '/iclock/cdata', function (Illuminate\Http\Request
             'serial' => $serial,
             'ip_address' => $request->ip(),
             'last_seen' => now()->toISOString(),
-            'device_type' => $request->query('DeviceType', 'att'),
-            'language' => $request->query('language', '69'),
-            'push_version' => $request->query('pushver', '2.4.1'),
-            'options' => $request->query('options', 'all'),
-            'push_options_flag' => $request->query('PushOptionsFlag', '1'),
+            'device_type' => $request->input('DeviceType', $request->query('DeviceType', 'att')),
+            'language' => $request->input('language', $request->query('language', '69')),
+            'push_version' => $request->input('pushver', $request->query('pushver', '2.4.1')),
+            'options' => $request->input('options', $request->query('options', 'all')),
+            'push_options_flag' => $request->input('PushOptionsFlag', $request->query('PushOptionsFlag', '1')),
             'user_agent' => $request->header('User-Agent', 'Unknown'),
             'status' => 'online'
         ];
