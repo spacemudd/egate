@@ -136,6 +136,22 @@ Route::match(['GET', 'POST'], '/iclock/verify', function (Illuminate\Http\Reques
 
 Route::match(['GET', 'POST'], '/iclock/getrequest', function (Illuminate\Http\Request $request) {
     $responseText = 'GET OPTIONS Stamp=0';
+    $serial = $request->input('SN', $request->query('SN'));
+
+    // If a per-device queued command exists, return and clear it
+    if (!empty($serial)) {
+        $cacheKey = 'zkteco_cmd_' . $serial;
+        $queued = \Cache::pull($cacheKey); // get and delete
+        if (!empty($queued)) {
+            $responseText = $queued;
+        }
+    }
+
+    // Allow manual fetch via query for testing
+    $fetch = $request->input('fetch', $request->query('fetch'));
+    if ($fetch === 'users') {
+        $responseText = 'GET USERINFO';
+    }
 
     \Log::info('[ZKTeco] /iclock/getrequest', [
         'method' => $request->method(),
@@ -173,6 +189,7 @@ Route::prefix('zkteco')->group(function () {
     Route::get('/devices', [ZKTecoController::class, 'index'])->name('zkteco.devices');
     Route::get('/devices/{serial}', [ZKTecoController::class, 'getDeviceDetails'])->name('zkteco.device.details');
     Route::post('/devices/clear-cache', [ZKTecoController::class, 'clearCache'])->name('zkteco.clear-cache');
+    Route::post('/devices/{serial}/sync', [ZKTecoController::class, 'syncDevice'])->name('zkteco.device.sync');
 });
 
 // Test routes for simulating eGate requests (remove in production)

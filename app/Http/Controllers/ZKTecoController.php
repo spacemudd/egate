@@ -124,4 +124,16 @@ class ZKTecoController extends Controller
         
         return response()->json(['error' => 'Device not found'], 404);
     }
+
+    /**
+     * Queue a sync command (GET USERINFO) for a specific device
+     */
+    public function syncDevice(string $serial)
+    {
+        // Store a one-time command for the device; consumed by /iclock/getrequest
+        Cache::put('zkteco_cmd_' . $serial, 'GET USERINFO', 300);
+
+        return redirect()->route('zkteco.devices')
+            ->with('success', 'Sync command queued for device ' . $serial);
+    }
 }

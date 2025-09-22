@@ -164,10 +164,18 @@
                                         </div>
                                         
                                         <div class="mt-3">
-                                            <button onclick="showDeviceDetails('{{ $device['serial'] }}')" 
-                                                    class="text-indigo-600 hover:text-indigo-500 text-sm font-medium">
-                                                View Details
-                                            </button>
+                                            <div class="flex items-center space-x-4">
+                                                <button onclick="showDeviceDetails('{{ $device['serial'] }}')" 
+                                                        class="text-indigo-600 hover:text-indigo-500 text-sm font-medium">
+                                                    View Details
+                                                </button>
+                                                <form method="POST" action="{{ route('zkteco.device.sync', ['serial' => $device['serial']]) }}">
+                                                    @csrf
+                                                    <button type="submit" class="text-sm font-medium text-green-700 hover:text-green-600">
+                                                        Sync
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
