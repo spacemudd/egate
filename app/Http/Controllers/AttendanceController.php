@@ -59,7 +59,7 @@ class AttendanceController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'device_id' => 'nullable|exists:biometric_devices,id',
-            'format' => 'required|in:excel,csv',
+            'format' => 'required|in:xlsx,csv',
         ]);
 
         $query = AttendanceRecord::with(['device', 'biometricUser'])
@@ -72,9 +72,36 @@ class AttendanceController extends Controller
 
         $records = $query->orderBy('punch_time')->get();
 
-        $filename = 'attendance_' . $request->start_date . '_to_' . $request->end_date . '.' . $request->format;
+        if ($records->isEmpty()) {
+            return redirect()->back()->with('error', 'No attendance records found for the selected date range.');
+        }
 
-        return Excel::download(new AttendanceExport($records), $filename);
+        $filename = 'attendance_' . $request->start_date . '_to_' . $request->end_date;
+        
+        // Determine the export type and add proper extension
+        $format = $request->format ?? 'xlsx';
+        $filename .= '.' . $format;
+        
+        // Map format to Excel type
+        $excelType = match(strtolower($format)) {
+            'csv' => \Maatwebsite\Excel\Excel::CSV,
+            'xlsx' => \Maatwebsite\Excel\Excel::XLSX,
+            default => \Maatwebsite\Excel\Excel::XLSX
+        };
+
+        try {
+            return Excel::download(new AttendanceExport($records), $filename, $excelType);
+        } catch (\Exception $e) {
+            \Log::error('Excel export failed', [
+                'error' => $e->getMessage(),
+                'filename' => $filename,
+                'format' => $format,
+                'excelType' => $excelType,
+                'records_count' => $records->count()
+            ]);
+            
+            return redirect()->back()->with('error', 'Export failed: ' . $e->getMessage());
+        }
     }
 
     /**

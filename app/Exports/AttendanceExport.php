@@ -44,14 +44,14 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
     public function map($record): array
     {
         return [
-            $record->device_user_id,
-            $record->biometricUser->name ?? 'Unknown',
+            $record->device_user_id ?? '',
+            $record->biometricUser->name ?? "User {$record->device_user_id}",
             $record->biometricUser->employee_id ?? '',
             $record->biometricUser->department ?? '',
-            $record->device->device_name ?? $record->device->serial_number,
-            $record->punch_time->format('Y-m-d H:i:s'),
-            $record->punch_type_label,
-            $record->verify_mode_label,
+            $record->device->device_name ?? $record->device->serial_number ?? 'Unknown Device',
+            $record->punch_time ? $record->punch_time->format('Y-m-d H:i:s') : '',
+            $record->punch_type_label ?? ucfirst($record->punch_type ?? ''),
+            $record->verify_mode_label ?? ($record->verify_mode ?? ''),
             $record->status ?? '',
             $record->work_code ?? '',
             $record->notes ?? '',
