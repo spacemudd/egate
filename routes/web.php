@@ -116,6 +116,11 @@ Route::match(['GET', 'POST'], '/iclock/cdata', function (Illuminate\Http\Request
         'timestamp' => now()->toISOString(),
     ]);
 
+    // Process ATTLOG data if it's attendance data
+    if ($table === 'ATTLOG' && $serial) {
+        app(\App\Http\Controllers\ZKTecoController::class)->processAttlogData($request);
+    }
+
     $xml = '<?xml version="1.0" encoding="UTF-8"?><Response><Status>OK</Status></Response>';
     return response($xml, 200)->header('Content-Type', 'application/xml');
 });
@@ -192,6 +197,30 @@ Route::prefix('zkteco')->group(function () {
     Route::post('/devices/{serial}/sync', [ZKTecoController::class, 'syncDevice'])->name('zkteco.device.sync');
     Route::post('/devices/{serial}/command', [ZKTecoController::class, 'queueCommand'])->name('zkteco.device.command');
     Route::post('/devices/{serial}/attlog', [ZKTecoController::class, 'requestAttlog'])->name('zkteco.device.attlog');
+});
+
+// Biometric system routes
+Route::prefix('biometric')->name('biometric.')->group(function () {
+    // Device management
+    Route::resource('devices', App\Http\Controllers\BiometricDeviceController::class);
+    Route::post('devices/sync-from-cache', [App\Http\Controllers\BiometricDeviceController::class, 'syncFromCache'])
+        ->name('devices.sync-from-cache');
+
+    // User management
+    Route::resource('users', App\Http\Controllers\BiometricUserController::class);
+    Route::post('users/bulk-import', [App\Http\Controllers\BiometricUserController::class, 'bulkImport'])
+        ->name('users.bulk-import');
+
+    // Attendance management
+    Route::get('attendance', [App\Http\Controllers\AttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('attendance/export', [App\Http\Controllers\AttendanceController::class, 'export'])->name('attendance.export');
+    Route::get('attendance/summary', [App\Http\Controllers\AttendanceController::class, 'summary'])->name('attendance.summary');
+    Route::post('attendance/process', [App\Http\Controllers\AttendanceController::class, 'process'])->name('attendance.process');
+
+    // Log import
+    Route::get('import/logs', [App\Http\Controllers\LogDataImportController::class, 'showImportForm'])->name('import.logs');
+    Route::post('import/logs', [App\Http\Controllers\LogDataImportController::class, 'importFromLogs'])->name('import.logs');
+    Route::post('import/preview', [App\Http\Controllers\LogDataImportController::class, 'previewLogData'])->name('import.preview');
 });
 
 // Test routes for simulating eGate requests (remove in production)

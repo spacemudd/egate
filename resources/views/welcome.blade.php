@@ -87,12 +87,60 @@
                             <div>
                                 <h2 class="text-xl font-semibold text-gray-900">ZKTeco Fingerprint Devices</h2>
                                 <p class="mt-4 text-gray-600 text-sm leading-relaxed">
-                                    Monitor connected ZKTeco fingerprint devices in real-time. View device status, 
-                                    connection details, and recent activity from fingerprint scanners.
+                                    Monitor and manage ZKTeco fingerprint devices with real-time status updates, 
+                                    user management, and attendance tracking capabilities.
                                 </p>
                                 <div class="mt-4">
-                                    <a href="{{ route('zkteco.devices') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <a href="{{ route('zkteco.devices') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                         View Devices
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="scale-100 p-6 bg-white from-gray-700/50 via-transparent rounded-lg shadow-2xl shadow-gray-500/20 flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                            <div>
+                                <h2 class="text-xl font-semibold text-gray-900">Biometric Attendance System</h2>
+                                <p class="mt-4 text-gray-600 text-sm leading-relaxed">
+                                    Complete biometric attendance management with user linking, 
+                                    attendance tracking, and Excel export functionality.
+                                </p>
+                                <div class="mt-4 space-x-2">
+                                    <a href="{{ route('biometric.devices.index') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        Manage Devices
+                                    </a>
+                                    <a href="{{ route('biometric.users.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        Manage Users
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="scale-100 p-6 bg-white from-gray-700/50 via-transparent rounded-lg shadow-2xl shadow-gray-500/20 flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                            <div>
+                                <h2 class="text-xl font-semibold text-gray-900">Attendance Reports</h2>
+                                <p class="mt-4 text-gray-600 text-sm leading-relaxed">
+                                    View and export attendance records with user names, punch times, 
+                                    and automatic punch in/out detection based on time.
+                                </p>
+                                <div class="mt-4">
+                                    <a href="{{ route('biometric.attendance.index') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        View Attendance
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="scale-100 p-6 bg-white from-gray-700/50 via-transparent rounded-lg shadow-2xl shadow-gray-500/20 flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
+                            <div>
+                                <h2 class="text-xl font-semibold text-gray-900">Log Data Import</h2>
+                                <p class="mt-4 text-gray-600 text-sm leading-relaxed">
+                                    Import existing attendance data from Laravel logs, including SYZ8252100929 device data. 
+                                    Automatically creates users and processes attendance records.
+                                </p>
+                                <div class="mt-4">
+                                    <a href="{{ route('biometric.import.logs') }}" class="inline-flex items-center px-4 py-2 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-700 focus:bg-orange-700 active:bg-orange-900 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        Import from Logs
                                     </a>
                                 </div>
                             </div>

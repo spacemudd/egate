@@ -182,4 +182,93 @@ class ZKTecoController extends Controller
         return redirect()->route('zkteco.devices')
             ->with('success', 'ATTLOG query queued for device ' . $serial . ' (Date range: ' . $startDate . ' to ' . $endDate . ')');
     }
+
+    /**
+     * Process ATTLOG data from ZKTeco devices
+     */
+    public function processAttlogData(Request $request)
+    {
+        $serial = $request->query('SN');
+        $table = $request->query('table');
+        $rawBody = $request->getContent();
+        
+        if ($table === 'ATTLOG' && $serial && !empty($rawBody)) {
+            $device = \App\Models\BiometricDevice::where('serial_number', $serial)->first();
+            
+            if ($device) {
+                $lines = preg_split("/(\r\n|\n|\r)/", trim($rawBody));
+                $processedCount = 0;
+                
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    if (empty($line)) continue;
+                    
+                    $parts = explode("\t", $line);
+                    if (count($parts) < 2) continue;
+                    
+                    $deviceUserId = $parts[0] ?? null;
+                    $datetimeStr = $parts[1] ?? null;
+                    $status = $parts[2] ?? null;
+                    $verifyMode = $parts[3] ?? null;
+                    $workCode = $parts[4] ?? null;
+                    
+                    if (!$deviceUserId || !$datetimeStr) continue;
+                    
+                    // Find or create biometric user
+                    $biometricUser = \App\Models\BiometricUser::where('device_id', $device->id)
+                        ->where('device_user_id', $deviceUserId)
+                        ->first();
+                    
+                    if (!$biometricUser) {
+                        $biometricUser = \App\Models\BiometricUser::create([
+                            'device_id' => $device->id,
+                            'device_user_id' => $deviceUserId,
+                            'name' => "User {$deviceUserId}",
+                            'last_sync' => now(),
+                        ]);
+                    }
+                    
+                    // Parse datetime
+                    try {
+                        $punchTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $datetimeStr);
+                    } catch (\Exception $e) {
+                        try {
+                            $punchTime = \Carbon\Carbon::parse($datetimeStr);
+                        } catch (\Exception $e) {
+                            continue; // Skip invalid datetime
+                        }
+                    }
+                    
+                    // Determine punch type based on time (before 4 PM = punch in, after = punch out)
+                    $punchType = $punchTime->format('H') < 16 ? 'in' : 'out';
+                    
+                    // Create attendance record
+                    \App\Models\AttendanceRecord::create([
+                        'device_id' => $device->id,
+                        'biometric_user_id' => $biometricUser->id,
+                        'device_user_id' => $deviceUserId,
+                        'punch_time' => $punchTime,
+                        'punch_type' => $punchType,
+                        'verify_mode' => $verifyMode,
+                        'status' => $status,
+                        'work_code' => $workCode,
+                        'device_data' => [
+                            'raw_line' => $line,
+                            'parts' => $parts,
+                        ],
+                    ]);
+                    
+                    $processedCount++;
+                }
+                
+                Log::info('[ZKTeco] ATTLOG processed', [
+                    'serial' => $serial,
+                    'device_id' => $device->id,
+                    'records_processed' => $processedCount,
+                ]);
+            }
+        }
+        
+        return response('OK', 200)->header('Content-Type', 'text/plain');
+    }
 }
