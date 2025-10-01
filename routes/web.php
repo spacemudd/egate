@@ -79,7 +79,7 @@ Route::match(['GET', 'POST'], '/iclock/cdata', function (Illuminate\Http\Request
 
     // Update device status in cache
     if ($serial) {
-        $devices = \Cache::get('zkteco_devices', []);
+        $devices = \Cache::store('file')->get('zkteco_devices', []);
         
         $deviceData = [
             'serial' => $serial,
@@ -98,7 +98,7 @@ Route::match(['GET', 'POST'], '/iclock/cdata', function (Illuminate\Http\Request
         $devices[$serial] = $deviceData;
         
         // Store in cache for 1 hour
-        \Cache::put('zkteco_devices', $devices, 3600);
+        \Cache::store('file')->put('zkteco_devices', $devices, 3600);
     }
 
     \Log::info('[ZKTeco] /iclock/cdata', [
@@ -141,7 +141,7 @@ Route::match(['GET', 'POST'], '/iclock/getrequest', function (Illuminate\Http\Re
     // If a per-device queued command exists, return and clear it
     if (!empty($serial)) {
         $cacheKey = 'zkteco_cmd_' . $serial;
-        $queued = \Cache::pull($cacheKey); // get and delete
+        $queued = \Cache::store('file')->pull($cacheKey); // get and delete
         if (!empty($queued)) {
             $responseText = $queued;
         }
@@ -190,6 +190,8 @@ Route::prefix('zkteco')->group(function () {
     Route::get('/devices/{serial}', [ZKTecoController::class, 'getDeviceDetails'])->name('zkteco.device.details');
     Route::post('/devices/clear-cache', [ZKTecoController::class, 'clearCache'])->name('zkteco.clear-cache');
     Route::post('/devices/{serial}/sync', [ZKTecoController::class, 'syncDevice'])->name('zkteco.device.sync');
+    Route::post('/devices/{serial}/command', [ZKTecoController::class, 'queueCommand'])->name('zkteco.device.command');
+    Route::post('/devices/{serial}/attlog', [ZKTecoController::class, 'requestAttlog'])->name('zkteco.device.attlog');
 });
 
 // Test routes for simulating eGate requests (remove in production)

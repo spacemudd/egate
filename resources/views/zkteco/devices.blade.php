@@ -169,10 +169,16 @@
                                                         class="text-indigo-600 hover:text-indigo-500 text-sm font-medium">
                                                     View Details
                                                 </button>
-                                                <form method="POST" action="{{ route('zkteco.device.sync', ['serial' => $device['serial']]) }}">
+                                                <form method="POST" action="{{ route('zkteco.device.sync', ['serial' => $device['serial']]) }}" class="inline">
                                                     @csrf
                                                     <button type="submit" class="text-sm font-medium text-green-700 hover:text-green-600">
-                                                        Sync
+                                                        Sync Users
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="{{ route('zkteco.device.attlog', ['serial' => $device['serial']]) }}" class="inline">
+                                                    @csrf
+                                                    <button type="submit" class="text-sm font-medium text-blue-700 hover:text-blue-600">
+                                                        Get ATTLOG (Last Month)
                                                     </button>
                                                 </form>
                                             </div>

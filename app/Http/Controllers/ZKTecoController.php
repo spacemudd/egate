@@ -15,7 +15,7 @@ class ZKTecoController extends Controller
     public function index()
     {
         // Get connected devices from cache (updated by the /iclock/cdata endpoint)
-        $devices = Cache::get('zkteco_devices', []);
+        $devices = Cache::store('file')->get('zkteco_devices', []);
         
         // Sort by last seen (most recent first)
         usort($devices, function($a, $b) {
@@ -69,7 +69,7 @@ class ZKTecoController extends Controller
         $ip = $request->ip();
         
         if ($serial) {
-            $devices = Cache::get('zkteco_devices', []);
+            $devices = Cache::store('file')->get('zkteco_devices', []);
             
             $deviceData = [
                 'serial' => $serial,
@@ -88,7 +88,7 @@ class ZKTecoController extends Controller
             $devices[$serial] = $deviceData;
             
             // Store in cache for 1 hour
-            Cache::put('zkteco_devices', $devices, 3600);
+            Cache::store('file')->put('zkteco_devices', $devices, 3600);
             
             Log::info('[ZKTeco] Device status updated', [
                 'serial' => $serial,
@@ -105,7 +105,7 @@ class ZKTecoController extends Controller
      */
     public function clearCache()
     {
-        Cache::forget('zkteco_devices');
+        Cache::store('file')->forget('zkteco_devices');
         
         return redirect()->route('zkteco.devices')
             ->with('success', 'Device cache cleared successfully.');
@@ -116,7 +116,7 @@ class ZKTecoController extends Controller
      */
     public function getDeviceDetails($serial)
     {
-        $devices = Cache::get('zkteco_devices', []);
+        $devices = Cache::store('file')->get('zkteco_devices', []);
         
         if (isset($devices[$serial])) {
             return response()->json($devices[$serial]);
@@ -131,9 +131,55 @@ class ZKTecoController extends Controller
     public function syncDevice(string $serial)
     {
         // Store a one-time command for the device; consumed by /iclock/getrequest
-        Cache::put('zkteco_cmd_' . $serial, 'GET USERINFO', 300);
+        Cache::store('file')->put('zkteco_cmd_' . $serial, 'GET USERINFO', 300);
 
         return redirect()->route('zkteco.devices')
             ->with('success', 'Sync command queued for device ' . $serial);
+    }
+
+    /**
+     * Queue a custom command for a specific device
+     */
+    public function queueCommand(Request $request, string $serial)
+    {
+        $command = $request->input('command', 'GET OPTIONS Stamp=0');
+        
+        // Store the command for the device; consumed by /iclock/getrequest
+        Cache::store('file')->put('zkteco_cmd_' . $serial, $command, 300);
+
+        Log::info('[ZKTeco] Command queued', [
+            'serial' => $serial,
+            'command' => $command,
+            'expires_at' => now()->addSeconds(300)->toISOString()
+        ]);
+
+        return redirect()->route('zkteco.devices')
+            ->with('success', 'Command queued for device ' . $serial . ': ' . $command);
+    }
+
+    /**
+     * Request ATTLOG data for a date range
+     */
+    public function requestAttlog(string $serial, Request $request)
+    {
+        $startDate = $request->input('start_date', now()->subMonth()->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->format('Y-m-d'));
+        
+        // Try different command formats that ZKTeco devices might understand
+        // Format 1: DATA QUERY with dates
+        $command = "DATA QUERY ATTLOG StartDate={$startDate} EndDate={$endDate}";
+        
+        Cache::store('file')->put('zkteco_cmd_' . $serial, $command, 300);
+
+        Log::info('[ZKTeco] ATTLOG query queued', [
+            'serial' => $serial,
+            'command' => $command,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'expires_at' => now()->addSeconds(300)->toISOString()
+        ]);
+
+        return redirect()->route('zkteco.devices')
+            ->with('success', 'ATTLOG query queued for device ' . $serial . ' (Date range: ' . $startDate . ' to ' . $endDate . ')');
     }
 }
