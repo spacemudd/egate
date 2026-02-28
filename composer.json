@@ -37,7 +37,7 @@
     },
     "scripts": {
         "post-autoload-dump": [
-            "@php -r \"if (file_exists('bootstrap/cache/config.php')) unlink('bootstrap/cache/config.php');\"",
+            "@php -r \"foreach (glob('bootstrap/cache/*.php') ?: [] as \$f) unlink(\$f);\"",
             "@php artisan config:clear",
             "@php artisan clear-compiled",
             "@php artisan package:discover --ansi"
