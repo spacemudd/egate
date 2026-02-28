@@ -29,35 +29,74 @@ class ZKTecoController extends Controller
     }
 
     /**
-     * Get recent ZKTeco activity from logs
+     * Get recent ZKTeco activity from logs.
+     * Reads only the tail of the log file to avoid timeouts with large logs.
      */
     private function getRecentActivity()
     {
         $logFile = storage_path('logs/laravel.log');
         $activity = [];
-        
-        if (file_exists($logFile)) {
-            $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            $recentLines = array_slice($lines, -1000); // Last 1000 lines
-            
-            foreach ($recentLines as $line) {
-                if (strpos($line, '[ZKTeco]') !== false) {
-                    // Extract timestamp and basic info
-                    if (preg_match('/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\].*\[ZKTeco\] (.*)/', $line, $matches)) {
-                        $activity[] = [
-                            'timestamp' => $matches[1],
-                            'message' => $matches[2],
-                            'raw_line' => $line
-                        ];
-                    }
+
+        if (!file_exists($logFile) || !is_readable($logFile)) {
+            return $activity;
+        }
+
+        $lines = $this->readLastLines($logFile, 1000);
+        if (empty($lines)) {
+            return $activity;
+        }
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+            if (strpos($line, '[ZKTeco]') !== false) {
+                if (preg_match('/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\].*\[ZKTeco\] (.*)/', $line, $matches)) {
+                    $activity[] = [
+                        'timestamp' => $matches[1],
+                        'message' => $matches[2],
+                        'raw_line' => $line
+                    ];
                 }
             }
-            
-            // Keep only last 50 activities
-            $activity = array_slice($activity, -50);
         }
-        
-        return array_reverse($activity); // Most recent first
+
+        $activity = array_slice($activity, -50);
+        return array_reverse($activity);
+    }
+
+    /**
+     * Read the last N lines from a file without loading the entire file.
+     * Uses a fixed tail size (512KB) to avoid memory and timeout issues with large logs.
+     */
+    private function readLastLines(string $path, int $maxLines): array
+    {
+        $tailBytes = 512 * 1024; // 512KB from end of file
+        $size = filesize($path);
+        if ($size === 0) {
+            return [];
+        }
+        $offset = max(0, $size - $tailBytes);
+        $handle = fopen($path, 'rb');
+        if ($handle === false) {
+            return [];
+        }
+        fseek($handle, $offset);
+        $chunk = stream_get_contents($handle);
+        fclose($handle);
+        if ($chunk === false || $chunk === '') {
+            return [];
+        }
+        // If we didn't read from the start, drop the first (possibly partial) line
+        if ($offset > 0) {
+            $firstNewline = strpos($chunk, "\n");
+            if ($firstNewline !== false) {
+                $chunk = substr($chunk, $firstNewline + 1);
+            }
+        }
+        $lines = preg_split("/(\r\n|\n|\r)/", $chunk, -1, PREG_SPLIT_NO_EMPTY);
+        return array_slice($lines, -$maxLines);
     }
 
     /**

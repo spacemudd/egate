@@ -1,0 +1,1114 @@
+========================================================================================================================
+HR ATTENDANCE REPORT - DETAILED HOURS WORKED
+========================================================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: ABDELRAHMAN KHANZMAN (ID: 4)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Sunday, September 28, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:21:43 AM
+      • Punch Out: 06:00:58 PM
+      • Duration:  9.65 hours (9h 39m)
+
+   ✓ Total Hours for Sep 28: 9.65 hours (9h 39m)
+
+📅 Date: Monday, September 29, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  07:59:34 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 02, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  07:34:44 AM
+      • Punch Out: 06:01:07 PM
+      • Duration:  10.44 hours (10h 26m)
+
+   ✓ Total Hours for Oct 02: 10.44 hours (10h 26m)
+
+📅 Date: Friday, October 03, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  07:59:15 AM
+      • Punch Out: 06:58:37 PM
+      • Duration:  10.99 hours (10h 59m)
+
+   ✓ Total Hours for Oct 03: 10.99 hours (10h 59m)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  07:57:33 AM
+      • Punch Out: 06:11:20 PM
+      • Duration:  10.23 hours (10h 13m)
+
+   ✓ Total Hours for Oct 04: 10.23 hours (10h 13m)
+
+📅 Date: Sunday, October 05, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:20:58 AM
+      • Punch Out: 07:34:06 PM
+      • Duration:  11.22 hours (11h 13m)
+
+   ✓ Total Hours for Oct 05: 11.22 hours (11h 13m)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:03:57 AM
+      • Punch Out: 06:45:39 PM
+      • Duration:  10.70 hours (10h 41m)
+
+   ✓ Total Hours for Oct 06: 10.70 hours (10h 41m)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:31:16 AM
+      • Punch Out: 06:14:29 PM
+      • Duration:  9.72 hours (9h 43m)
+
+   ✓ Total Hours for Oct 07: 9.72 hours (9h 43m)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:14:46 AM
+      • Punch Out: 06:02:34 PM
+      • Duration:  9.80 hours (9h 47m)
+
+   ✓ Total Hours for Oct 09: 9.80 hours (9h 47m)
+
+====================================================================================================
+📊 TOTAL HOURS FOR ABDELRAHMAN KHANZMAN: 82.74 hours (82h 44m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: AHMED OSAMA (ID: 2)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Sunday, September 28, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:11:31 PM
+      • Punch Out: 06:58:11 PM
+      • Duration:  6.78 hours (6h 46m)
+
+   ✓ Total Hours for Sep 28: 6.78 hours (6h 46m)
+
+📅 Date: Monday, September 29, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:20:54 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Wednesday, October 01, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:05:36 AM
+      • Punch Out: 09:36:50 PM
+      • Duration:  11.52 hours (11h 31m)
+
+   ✓ Total Hours for Oct 01: 11.52 hours (11h 31m)
+
+📅 Date: Thursday, October 02, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  09:57:10 AM
+      • Punch Out: 07:05:37 PM
+      • Duration:  9.14 hours (9h 8m)
+
+   ✓ Total Hours for Oct 02: 9.14 hours (9h 8m)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  09:52:42 AM
+      • Punch Out: 06:27:07 PM
+      • Duration:  8.57 hours (8h 34m)
+
+   ✓ Total Hours for Oct 04: 8.57 hours (8h 34m)
+
+📅 Date: Sunday, October 05, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:05:59 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:19:12 AM
+      • Punch Out: 07:46:57 PM
+      • Duration:  9.46 hours (9h 27m)
+
+   ✓ Total Hours for Oct 06: 9.46 hours (9h 27m)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  09:49:07 AM
+      • Punch Out: 07:00:38 PM
+      • Duration:  9.19 hours (9h 11m)
+
+   ✓ Total Hours for Oct 07: 9.19 hours (9h 11m)
+
+📅 Date: Wednesday, October 08, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  09:40:23 AM
+      • Punch Out: 06:52:33 PM
+      • Duration:  9.20 hours (9h 12m)
+
+   ✓ Total Hours for Oct 08: 9.20 hours (9h 12m)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:11:33 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR AHMED OSAMA: 63.87 hours (63h 52m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: BELAL ABDELMONAM (ID: 9)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Sunday, September 28, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:03:57 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, September 29, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:24:45 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  12:07:48 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Wednesday, October 01, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  11:43:42 AM
+      • Punch Out: 09:36:36 PM
+      • Duration:  9.88 hours (9h 52m)
+
+   ✓ Total Hours for Oct 01: 9.88 hours (9h 52m)
+
+📅 Date: Thursday, October 02, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:28:16 AM
+      • Punch Out: 10:55:31 PM
+      • Duration:  12.45 hours (12h 27m)
+
+   ✓ Total Hours for Oct 02: 12.45 hours (12h 27m)
+
+📅 Date: Friday, October 03, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:31:38 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:04:28 AM
+      • Punch Out: 09:17:50 PM
+      • Duration:  21.22 hours (21h 13m)
+
+   ✓ Total Hours for Oct 04: 21.22 hours (21h 13m)
+
+📅 Date: Sunday, October 05, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:06:08 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:15:13 AM
+      • Punch Out: 11:42:33 PM
+      • Duration:  23.46 hours (23h 27m)
+
+   ✓ Total Hours for Oct 06: 23.46 hours (23h 27m)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:27:41 PM
+      • Punch Out: 11:45:42 PM
+      • Duration:  11.30 hours (11h 18m)
+
+   ✓ Total Hours for Oct 07: 11.30 hours (11h 18m)
+
+📅 Date: Wednesday, October 08, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:02:19 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:13:57 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  12:02:14 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR BELAL ABDELMONAM: 78.31 hours (78h 18m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: EMAD ELSAYED (ID: 5)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Wednesday, October 01, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:15:09 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  11:57:20 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Sunday, October 05, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  11:08:31 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:19:06 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  01:45:47 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR EMAD ELSAYED: 0.00 hours (0h 0m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: ENAS ELZUBIER (ID: 6)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Sunday, September 28, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:20:39 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:45:00 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, September 29, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  02:10:04 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Wednesday, October 01, 2025
+----------------------------------------------------------------------------------------------------
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 02, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  02:12:57 PM
+      • Punch Out: 10:30:46 PM
+      • Duration:  8.30 hours (8h 17m)
+
+   ✓ Total Hours for Oct 02: 8.30 hours (8h 17m)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  01:56:56 PM
+      • Punch Out: 11:33:14 PM
+      • Duration:  9.61 hours (9h 36m)
+
+   ✓ Total Hours for Oct 04: 9.61 hours (9h 36m)
+
+📅 Date: Sunday, October 05, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:17:03 AM
+      • Punch Out: 04:04:01 PM
+      • Duration:  7.78 hours (7h 46m)
+
+   ✓ Total Hours for Oct 05: 7.78 hours (7h 46m)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  02:01:10 PM
+      • Punch Out: 10:01:48 PM
+      • Duration:  8.01 hours (8h 0m)
+
+   ✓ Total Hours for Oct 06: 8.01 hours (8h 0m)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  02:02:38 PM
+      • Punch Out: 10:02:17 PM
+      • Duration:  7.99 hours (7h 59m)
+
+   ✓ Total Hours for Oct 07: 7.99 hours (7h 59m)
+
+📅 Date: Wednesday, October 08, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  02:08:30 PM
+      • Punch Out: 10:01:52 PM
+      • Duration:  7.89 hours (7h 53m)
+
+   ✓ Total Hours for Oct 08: 7.89 hours (7h 53m)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  02:07:46 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR ENAS ELZUBIER: 49.58 hours (49h 34m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: KAREEM HASSAN (ID: 12)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Sunday, September 28, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  02:17:20 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, September 29, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:05:33 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 02, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:06:48 AM
+      • Punch Out: 07:27:12 PM
+      • Duration:  11.34 hours (11h 20m)
+
+   ✓ Total Hours for Oct 02: 11.34 hours (11h 20m)
+
+📅 Date: Friday, October 03, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:08:13 AM
+      • Punch Out: 08:47:51 PM
+      • Duration:  12.66 hours (12h 39m)
+
+   ✓ Total Hours for Oct 03: 12.66 hours (12h 39m)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:03:49 AM
+      • Punch Out: 06:00:53 PM
+      • Duration:  9.95 hours (9h 57m)
+
+   ✓ Total Hours for Oct 04: 9.95 hours (9h 57m)
+
+📅 Date: Sunday, October 05, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:17:09 AM
+      • Punch Out: 10:20:36 PM
+      • Duration:  14.06 hours (14h 3m)
+
+   ✓ Total Hours for Oct 05: 14.06 hours (14h 3m)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:37:40 AM
+      • Punch Out: 08:36:11 PM
+      • Duration:  11.98 hours (11h 58m)
+
+   ✓ Total Hours for Oct 07: 11.98 hours (11h 58m)
+
+📅 Date: Wednesday, October 08, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:07:00 AM
+      • Punch Out: 06:01:45 PM
+      • Duration:  9.91 hours (9h 54m)
+
+   ✓ Total Hours for Oct 08: 9.91 hours (9h 54m)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:49:47 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR KAREEM HASSAN: 69.90 hours (69h 53m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: MARICUTIE (ID: 1)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Monday, September 29, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:12:20 AM
+      • Punch Out: 05:00:46 PM
+      • Duration:  8.81 hours (8h 48m)
+
+   ✓ Total Hours for Sep 29: 8.81 hours (8h 48m)
+
+📅 Date: Wednesday, October 01, 2025
+----------------------------------------------------------------------------------------------------
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 02, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:11:21 AM
+      • Punch Out: 04:10:19 PM
+      • Duration:  7.98 hours (7h 58m)
+
+   ✓ Total Hours for Oct 02: 7.98 hours (7h 58m)
+
+📅 Date: Friday, October 03, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:17:04 AM
+      • Punch Out: 04:07:33 PM
+      • Duration:  7.84 hours (7h 50m)
+
+   ✓ Total Hours for Oct 03: 7.84 hours (7h 50m)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  07:41:04 AM
+      • Punch Out: 04:14:38 PM
+      • Duration:  8.56 hours (8h 33m)
+
+   ✓ Total Hours for Oct 04: 8.56 hours (8h 33m)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:33:46 AM
+      • Punch Out: 05:40:18 PM
+      • Duration:  9.11 hours (9h 6m)
+
+   ✓ Total Hours for Oct 06: 9.11 hours (9h 6m)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:18:30 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:46:56 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Wednesday, October 08, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  07:52:42 AM
+      • Punch Out: 05:14:45 PM
+      • Duration:  9.37 hours (9h 22m)
+
+   ✓ Total Hours for Oct 08: 9.37 hours (9h 22m)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  08:19:45 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:23:07 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR MARICUTIE: 51.67 hours (51h 40m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: MOHAMED BABIKER (ID: 11)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Sunday, September 28, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:25:36 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, September 29, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:26:14 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  12:08:01 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 02, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:39:24 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  10:23:28 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Friday, October 03, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:36:50 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  12:08:49 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  11:57:51 AM
+      • Punch Out: 09:18:10 PM
+      • Duration:  9.34 hours (9h 20m)
+
+   ✓ Total Hours for Oct 04: 9.34 hours (9h 20m)
+
+📅 Date: Sunday, October 05, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:06:15 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:15:29 AM
+      • Punch Out: 11:42:48 PM
+      • Duration:  23.46 hours (23h 27m)
+
+   ✓ Total Hours for Oct 06: 23.46 hours (23h 27m)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:27:47 PM
+      • Punch Out: 11:45:51 PM
+      • Duration:  11.30 hours (11h 18m)
+
+   ✓ Total Hours for Oct 07: 11.30 hours (11h 18m)
+
+📅 Date: Wednesday, October 08, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:02:28 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:14:01 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  12:03:12 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR MOHAMED BABIKER: 44.09 hours (44h 5m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: MOHAMED HAMADA (ID: 7)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Wednesday, October 01, 2025
+----------------------------------------------------------------------------------------------------
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 02, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:39:38 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:03:20 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 3:
+      • Punch In:  03:03:22 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Friday, October 03, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:35:52 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:13:34 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 3:
+      • Punch In:  03:13:36 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:58:50 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:25:27 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 3:
+      • Punch In:  03:25:28 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Sunday, October 05, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  02:59:59 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:15:00 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:39:56 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:57:10 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Wednesday, October 08, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  03:14:20 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  01:01:32 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:23:23 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR MOHAMED HAMADA: 0.00 hours (0h 0m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: MOHAMED OMER (ID: 8)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Sunday, September 28, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  03:42:50 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, September 29, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:57:50 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:58:04 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Wednesday, October 01, 2025
+----------------------------------------------------------------------------------------------------
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 02, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:57:41 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:46:24 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Friday, October 03, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  01:01:30 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:51:00 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  01:05:18 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Sunday, October 05, 2025
+----------------------------------------------------------------------------------------------------
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  01:02:38 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:54:55 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:57:04 AM
+      • Punch Out: 04:01:56 PM
+      • Duration:  15.08 hours (15h 4m)
+
+   ✓ Total Hours for Oct 07: 15.08 hours (15h 4m)
+
+📅 Date: Wednesday, October 08, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  01:00:58 AM
+      • Punch Out: 04:01:01 PM
+      • Duration:  15.00 hours (15h 0m)
+
+   ✓ Total Hours for Oct 08: 15.00 hours (15h 0m)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  01:01:24 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:59:26 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR MOHAMED OMER: 30.08 hours (30h 4m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: MOHMED HASSAN CARWASH (ID: 10)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Sunday, September 28, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:25:31 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, September 29, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:26:10 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  12:07:51 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 02, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:39:01 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  01:26:25 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Friday, October 03, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:36:06 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  12:08:45 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:03:29 AM
+      • Punch Out: 09:17:55 PM
+      • Duration:  21.24 hours (21h 14m)
+
+   ✓ Total Hours for Oct 04: 21.24 hours (21h 14m)
+
+📅 Date: Sunday, October 05, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:06:05 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:15:21 AM
+      • Punch Out: 11:42:39 PM
+      • Duration:  23.45 hours (23h 27m)
+
+   ✓ Total Hours for Oct 06: 23.45 hours (23h 27m)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:27:51 PM
+      • Punch Out: 11:46:03 PM
+      • Duration:  11.30 hours (11h 18m)
+
+   ✓ Total Hours for Oct 07: 11.30 hours (11h 18m)
+
+📅 Date: Wednesday, October 08, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:02:21 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Thursday, October 09, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:14:05 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  12:02:22 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR MOHMED HASSAN CARWASH: 56.00 hours (55h 59m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: User 1000 (ID: 1000)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Wednesday, October 01, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  11:31:02 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  11:31:03 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR USER 1000: 0.00 hours (0h 0m)
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+EMPLOYEE: User 14 (ID: 14)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+📅 Date: Wednesday, October 01, 2025
+----------------------------------------------------------------------------------------------------
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Friday, October 03, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  03:12:58 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Saturday, October 04, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  03:25:19 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Monday, October 06, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  10:20:22 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Tuesday, October 07, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  03:34:42 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+📅 Date: Wednesday, October 08, 2025
+----------------------------------------------------------------------------------------------------
+   Shift 1:
+      • Punch In:  12:55:55 AM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+   Shift 2:
+      • Punch In:  03:14:14 PM
+      • Punch Out: ⚠️  MISSING (Still working or forgot to punch out)
+
+   ⚠️  No complete shift recorded (only partial punches)
+
+====================================================================================================
+📊 TOTAL HOURS FOR USER 14: 0.00 hours (0h 0m)
+====================================================================================================
+
+
+========================================================================================================================
+SUMMARY
+========================================================================================================================
+Total Employees: 13
+Grand Total Hours (All Employees): 526.25 hours (526h 14m)
+Average Hours per Employee: 40.48 hours
+========================================================================================================================
